@@ -6,4 +6,8 @@
     <AssemblyName>WebmiliosCommons</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Networking\" />
+  </ItemGroup>
+
 </Project>
