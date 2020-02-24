@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Webmilio.Commons.Logging
 {
@@ -15,19 +16,47 @@ namespace Webmilio.Commons.Logging
 
             ToSystemDiagnostics = toSystemDiagnostics;
             ToConsole = toConsole;
+
+            LogLevel = LogLevel.Info;
         }
 
 
         public virtual void Log(LogLevel level, string message)
         {
-            string formattedLog = $"{DateTime.Now.ToLongTimeString()} [{level.ToString()}] : {message}";
+            if (level < LogLevel)
+                return;
+
+            message = $"{DateTime.Now.ToLongTimeString()} [{level.ToString()}] : {message}";
 
             if (ToSystemDiagnostics)
-                System.Diagnostics.Debug.WriteLine(formattedLog);
+                System.Diagnostics.Debug.WriteLine(message);
 
             if (ToConsole)
-                Console.WriteLine(message);
+            {
+                if (level > LogLevel.Log)
+                {
+                    if (level == LogLevel.Warning)
+                        WriteLine(message, ConsoleColor.Yellow);
+                    else if (level > LogLevel.Warning)
+                        WriteLine(message, ConsoleColor.Red);
+                }
+                else
+                    Console.WriteLine(message);
+            }
         }
+
+
+        private void Write(string message, ConsoleColor color)
+        {
+            ConsoleColor ogColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+
+            Console.Write(message);
+
+            Console.ForegroundColor = ogColor;
+        }
+
+        private void WriteLine(string message, ConsoleColor color) => Write(message + Environment.NewLine, color);
 
 
         public virtual void Fatal(string message) => Log(LogLevel.Fatal, message);
@@ -47,6 +76,9 @@ namespace Webmilio.Commons.Logging
 
         public bool ToSystemDiagnostics { get; }
         public bool ToConsole { get; }
+
+
+        public LogLevel LogLevel { get; set; }
 
 
         #region Static
