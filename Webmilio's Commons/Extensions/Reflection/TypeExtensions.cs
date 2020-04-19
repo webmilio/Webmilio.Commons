@@ -11,10 +11,8 @@ namespace Webmilio.Commons.Extensions.Reflection
 
         public static IEnumerable<TypeInfo> Concrete<T>(this IEnumerable<TypeInfo> types)
         {
-            TypeInfo type = typeof(T).GetTypeInfo();
-
-            foreach (TypeInfo typeInfo in types)
-                if (type.IsAssignableFrom(typeInfo))
+            foreach (TypeInfo typeInfo in types.Concrete())
+                if (typeInfo.IsSubclassOf(typeof(T)))
                     yield return typeInfo;
 
             // Concrete(types).Where(t => t.IsSubclassOf(typeof(T)));

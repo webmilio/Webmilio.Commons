@@ -25,7 +25,7 @@ namespace Webmilio.Commons.Loaders
             generics = new Dictionary<Type, int>();
             List<T> foundTypes = new List<T>();
             
-            foreach (TypeInfo type in Assembly.GetExecutingAssembly().Concrete<T>())
+            foreach (TypeInfo type in typeof(T).Assembly.Concrete<T>())
                 if (LoadCondition(type))
                 {
                     T instance = (T) Activator.CreateInstance(type);

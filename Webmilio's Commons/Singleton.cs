@@ -1,4 +1,7 @@
-﻿namespace Webmilio.Commons
+﻿using System;
+using System.Collections.Generic;
+
+namespace Webmilio.Commons
 {
     // Taken from Magicka.
     public class Singleton<T> where T : class, new()
