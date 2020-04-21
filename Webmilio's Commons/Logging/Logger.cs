@@ -7,6 +7,7 @@ namespace Webmilio.Commons.Logging
 {
     public class Logger
     {
+        public delegate void LogDelegate(LogLevel level, string message);
         private static readonly ConcurrentDictionary<string, Logger> _loggers = new ConcurrentDictionary<string, Logger>(new LoggerNameEqualityComparer());
 
 
@@ -69,7 +70,11 @@ namespace Webmilio.Commons.Logging
 
         public virtual void Info(string message) => Log(LogLevel.Info, message);
 
-        public virtual void Verbose(string message) => Log(LogLevel.Verbose, message);
+        public virtual void Fine(string message) => Log(LogLevel.Fine, message);
+
+        public virtual void Finest(string message) => Log(LogLevel.Finest, message);
+
+        public virtual void Debug(string message) => Log(LogLevel.Debug, message);
 
 
         public string LoggerName { get; }
@@ -79,6 +84,9 @@ namespace Webmilio.Commons.Logging
 
 
         public LogLevel LogLevel { get; set; }
+
+
+        public event LogDelegate LogCreated;
 
 
         #region Static

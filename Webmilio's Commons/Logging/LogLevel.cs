@@ -2,7 +2,9 @@
 {
     public enum LogLevel
     {
-        Verbose,
+        Debug,
+        Finest,
+        Fine,
         Info,
         Log,
         Warning,

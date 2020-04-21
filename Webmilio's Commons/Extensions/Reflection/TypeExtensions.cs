@@ -13,7 +13,7 @@ namespace Webmilio.Commons.Extensions.Reflection
         {
             TypeInfo type = typeof(T).GetTypeInfo();
 
-            foreach (TypeInfo typeInfo in types)
+            foreach (TypeInfo typeInfo in types.Concrete())
                 if (type.IsAssignableFrom(typeInfo))
                     yield return typeInfo;
 
