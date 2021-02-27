@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
@@ -46,6 +47,23 @@ namespace Webmilio.Commons.Extensions
                 Build();
 
             return remake;
+        }
+
+
+        public static void Do<T>(this IEnumerable<T> source, Action<T> action)
+        {
+            if (source is IList<T> list)
+                for (int i = 0; i < list.Count; i++)
+                    action(list[i]);
+            else
+                foreach (var e in source)
+                    action(e);
+        }
+
+        public static void Do<T>(this IList<T> source, Action<T, int> action)
+        {
+            for (int i = 0; i < source.Count; i++)
+                action(source[i], i);
         }
     }
 }

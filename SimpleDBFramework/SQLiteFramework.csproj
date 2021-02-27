@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>WebmilioCommons.SQLiteFramework</RootNamespace>
+    <AssemblyName>WebmilioCommons.SQLiteFramework</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Webmilio's Commons\Webmilio's Commons.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\Sandbox\bin\Debug\netcoreapp3.1\System.Data.SQLite.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

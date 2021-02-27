@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Webmilio.Commons.Extensions.Reflection;
+using Webmilio.Commons.Helpers;
 
 namespace Webmilio.Commons.Loaders
 {
-    public abstract class Loader<T> : IDisposable
+    public abstract class PrototypeLoader<T> : IDisposable
     {
         protected Dictionary<Type, int> generics;
         protected T[] instances;
 
 
-        protected Loader()
+        protected PrototypeLoader()
         {
             Initialize();
         }
@@ -22,25 +24,29 @@ namespace Webmilio.Commons.Loaders
             if (!PreInitialize())
                 return;
 
+
             generics = new Dictionary<Type, int>();
-            List<T> foundTypes = new List<T>();
+            var foundTypes = new List<T>();
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (TypeInfo type in assembly.Concrete<T>())
+                    if (LoadCondition(type))
+                    {
+                        T instance = TypeHelpers.Instantiate<T>();
+
+                        if (!PreAdd(type, ref instance))
+                            continue;
+
+                        generics.Add(type, foundTypes.Count);
+                        foundTypes.Add(instance);
+
+                        PostAdd(type, instance);
+                    }
+
             
-            foreach (TypeInfo type in typeof(T).Assembly.Concrete<T>())
-                if (LoadCondition(type))
-                {
-                    T instance = (T) Activator.CreateInstance(type);
-
-                    if (!PreAdd(type, ref instance))
-                        continue;
-
-                    generics.Add(type, foundTypes.Count);
-                    foundTypes.Add(instance);
-
-                    PostAdd(type, instance);
-                }
-
             LoadedTypes = generics.Keys;
             instances = foundTypes.ToArray();
+
 
             PostInitialize();
         }
@@ -66,9 +72,13 @@ namespace Webmilio.Commons.Loaders
         public int Id(Type type) => generics[type];
 
 
+        public IEnumerable<T> AsEnumerable() => instances.AsEnumerable();
+
+
         public virtual Predicate<TypeInfo> LoadCondition { get; } = obj => true;
 
         public Dictionary<Type, int>.KeyCollection LoadedTypes { get; private set; }
+
 
         public int Count => instances.Length;
         public T this[int index] => instances[index];

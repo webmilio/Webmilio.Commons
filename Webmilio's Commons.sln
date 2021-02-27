@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webmilio's Commons", "Webmilio's Commons\Webmilio's Commons.csproj", "{EE394CBC-58BF-491E-AD17-995C9A2BA25B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio's Commons", "Webmilio's Commons\Webmilio's Commons.csproj", "{EE394CBC-58BF-491E-AD17-995C9A2BA25B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebmilioCommons.Sandbox", "Sandbox\WebmilioCommons.Sandbox.csproj", "{C4981421-3B5B-42DB-9248-0278D95F0AFB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLiteFramework", "SimpleDBFramework\SQLiteFramework.csproj", "{25D681FF-0966-4EB0-810E-7B215B312D1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLiteFramework.Sandbox", "SQLiteFramework.Sandbox\SQLiteFramework.Sandbox.csproj", "{B2231256-24AE-4AA2-8168-65DD7FED774B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{EE394CBC-58BF-491E-AD17-995C9A2BA25B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE394CBC-58BF-491E-AD17-995C9A2BA25B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE394CBC-58BF-491E-AD17-995C9A2BA25B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4981421-3B5B-42DB-9248-0278D95F0AFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4981421-3B5B-42DB-9248-0278D95F0AFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4981421-3B5B-42DB-9248-0278D95F0AFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4981421-3B5B-42DB-9248-0278D95F0AFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25D681FF-0966-4EB0-810E-7B215B312D1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25D681FF-0966-4EB0-810E-7B215B312D1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25D681FF-0966-4EB0-810E-7B215B312D1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25D681FF-0966-4EB0-810E-7B215B312D1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2231256-24AE-4AA2-8168-65DD7FED774B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2231256-24AE-4AA2-8168-65DD7FED774B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2231256-24AE-4AA2-8168-65DD7FED774B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2231256-24AE-4AA2-8168-65DD7FED774B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
