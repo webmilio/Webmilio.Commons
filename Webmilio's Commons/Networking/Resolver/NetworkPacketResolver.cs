@@ -46,35 +46,35 @@ namespace Webmilio.Commons.Networking.Resolver
             return _toId[type];
         }
 
-        public void Send<T>(object caller, BinaryWriter writer) where T : INetworkPacket, new()
+        public void Send<T>(BinaryWriter writer, object caller) where T : INetworkPacket, new()
         {
-            Send(caller, writer, Activator.CreateInstance<T>());
+            Send(writer, Activator.CreateInstance<T>(), caller);
         }
 
-        public void Send(object caller, BinaryWriter writer, INetworkPacket packet)
+        public void Send(BinaryWriter writer, INetworkPacket packet, object caller)
         {
-            if (!PreSend(caller, writer))
+            if (!PreSend(writer, caller))
                 return;
 
             if (packet.Id == 0)
                 packet.Id = _toId[packet.GetType()];
 
             packet.Send(this, writer, caller);
-            PostSend(caller, writer, packet.Id, packet);
+            PostSend(writer, packet.Id, packet, caller);
 
             writer.Flush();
         }
 
-        public INetworkPacket Receive(object caller, BinaryReader reader)
+        public INetworkPacket Receive(BinaryReader reader, object caller)
         {
-            if (!PreReceive(caller, reader))
+            if (!PreReceive(reader, caller))
                 return default;
 
             short packetId = reader.ReadInt16();
 
             if (packetId <= 0)
             {
-                NonMappedPacketIdReceive(caller, reader, packetId);
+                NonMappedPacketIdReceive(reader, packetId, caller);
                 return default;
             }
 
@@ -82,18 +82,18 @@ namespace Webmilio.Commons.Networking.Resolver
             packet.Id = packetId;
 
             packet.Receive(this, reader, caller);
-            PostReceive(caller, reader, packetId, packet);
+            PostReceive(reader, packetId, packet, caller);
 
             return packet;
         }
 
 
-        protected virtual bool PreSend(object caller, BinaryWriter writer) => true;
-        protected virtual void PostSend(object caller, BinaryWriter writer, short packetId, INetworkPacket packet) { }
+        protected virtual bool PreSend(BinaryWriter writer, object caller) => true;
+        protected virtual void PostSend(BinaryWriter writer, short packetId, INetworkPacket packet, object caller) { }
 
-        protected virtual bool PreReceive(object caller, BinaryReader reader) => true;
-        protected virtual void PostReceive(object caller, BinaryReader reader, short packetId, INetworkPacket packet) { }
-        protected virtual void NonMappedPacketIdReceive(object caller, BinaryReader reader, short packetId) { }
+        protected virtual bool PreReceive(BinaryReader reader, object caller) => true;
+        protected virtual void PostReceive(BinaryReader reader, short packetId, INetworkPacket packet, object caller) { }
+        protected virtual void NonMappedPacketIdReceive(BinaryReader reader, short packetId, object caller) { }
 
 
         public INetworkPacketMapper Mapper { get; }
