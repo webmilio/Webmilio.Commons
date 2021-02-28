@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Webmilio.Commons.Extensions;
@@ -24,10 +25,17 @@ namespace Webmilio.Commons.DependencyInjection
         {
         }
 
-        public ServiceProvider(bool mapServiceAttribute)
+        public ServiceProvider(params ServiceProvider[] parents) : this(false, parents)
+        {
+        }
+
+        public ServiceProvider(bool mapServiceAttribute, params ServiceProvider[] parents)
         {
             AddInstance(this);
             ServiceAttributeMapped = mapServiceAttribute;
+
+            for (int i = 0; i < parents.Length; i++)
+                AddProvider(parents[i]);
 
             if (!mapServiceAttribute)
                 return;
@@ -36,9 +44,9 @@ namespace Webmilio.Commons.DependencyInjection
             {
                 var attribute = t.GetCustomAttribute<ServiceAttribute>();
 
-                if (attribute == default) 
+                if (attribute == default)
                     return;
-                
+
                 switch (attribute.Type)
                 {
                     case ServiceType.Singleton:
@@ -122,14 +130,13 @@ namespace Webmilio.Commons.DependencyInjection
 
         public object GetService(Type serviceType)
         {
-            if (!_map.TryGetValue(serviceType, out var mapping))
-                throw new ArgumentException("No such instance mapped for this service.");
+            object instance = default;
 
-            var instance = GetOrMake(mapping);
-            
-            if (instance == default)
-                for (int i = 0; i < _providers.Count && instance == default; i++)
-                    instance = _providers[i].GetService(mapping);
+            if (_map.TryGetValue(serviceType, out var mapping)) 
+                instance = GetOrMake(mapping);
+
+            for (int i = 0; i < _providers.Count && instance == default; i++)
+                instance = _providers[i].GetService(serviceType);
 
             return instance;
         }
@@ -156,7 +163,7 @@ namespace Webmilio.Commons.DependencyInjection
 
         public object Make(Type serviceType)
         {
-            if (!IsMapped(serviceType)) // We support non-mapped types (aka not services).
+            if (!HasMapping(serviceType)) // We support non-mapped types (aka not services).
             {
                 return MapConstructorAndMake(serviceType);
             }
@@ -179,7 +186,7 @@ namespace Webmilio.Commons.DependencyInjection
             var match = FindConstructor(serviceType);
 
             if (match == default)
-                throw new AmbiguousMatchException("There are no constructors found which match the current available services.");
+                throw new AmbiguousMatchException($"There are no constructors found which match the current available services for type {serviceType}.");
 
             _constructors.Add(serviceType, match);
             return MakeFromConstructor(match, match.GetParameters());
@@ -196,7 +203,9 @@ namespace Webmilio.Commons.DependencyInjection
                 bool parameterMapped = true;
 
                 for (int i = 0; i < parameters.Length && parameterMapped; i++)
-                    parameterMapped = IsMapped(parameters[i].ParameterType);
+                {
+                    parameterMapped = HasMapping(parameters[i].ParameterType);
+                }
 
                 if (parameterMapped && (match == null || matchParameters.Length < parameters.Length))
                 {
@@ -249,6 +258,9 @@ namespace Webmilio.Commons.DependencyInjection
 
         private void MapInterfaceType(Type origin, Type current)
         {
+            if (current == typeof(IDisposable))
+                return;
+
             foreach (var inter in current.GetInterfaces())
             {
                 MapOrRemap(origin, inter);
@@ -269,9 +281,20 @@ namespace Webmilio.Commons.DependencyInjection
                 _map.Add(current, origin);
         }
 
-        private bool IsMapped(Type serviceType)
+        private bool HasMapping(Type serviceType)
         {
-            return _map.ContainsKey(serviceType);
+            if (_map.ContainsKey(serviceType))
+                return true;
+
+            for (int i = 0; i < _providers.Count; i++)
+            {
+                if (_providers[i] is ServiceProvider sp && sp.HasMapping(serviceType))
+                    return true;
+
+                return _providers[i].GetService(serviceType) != default;
+            }
+
+            return false;
         }
 
 
