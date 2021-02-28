@@ -11,10 +11,10 @@ namespace Webmilio.Commons.Networking.Resolver
 
         short GetPacketId(Type type);
 
-        void Send(BinaryWriter writer, INetworkPacket packet);
+        void Send(object caller, BinaryWriter writer, INetworkPacket packet);
 
 
-        INetworkPacket Receive(BinaryReader reader);
+        INetworkPacket Receive(object caller, BinaryReader reader);
 
 
         INetworkPacketMapper Mapper { get; }

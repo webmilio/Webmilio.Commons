@@ -5,9 +5,9 @@ namespace Webmilio.Commons.Networking
 {
     public interface INetworkPacket
     {
-        void Send(INetworkPacketResolver resolver, BinaryWriter writer);
+        void Send(INetworkPacketResolver resolver, BinaryWriter writer, object caller);
 
-        void Receive(INetworkPacketResolver resolver, BinaryReader reader);
+        void Receive(INetworkPacketResolver resolver, BinaryReader reader, object caller);
 
 
         [Ignore]
