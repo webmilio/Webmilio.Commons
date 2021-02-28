@@ -13,7 +13,8 @@ namespace Webmilio.Commons.Networking.Resolver
 
         void Send(BinaryWriter writer, INetworkPacket packet);
 
-        void Receive(BinaryReader reader);
+
+        INetworkPacket Receive(BinaryReader reader);
 
 
         INetworkPacketMapper Mapper { get; }

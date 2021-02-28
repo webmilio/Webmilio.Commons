@@ -65,17 +65,17 @@ namespace Webmilio.Commons.Networking.Resolver
             writer.Flush();
         }
 
-        public void Receive(BinaryReader reader)
+        public INetworkPacket Receive(BinaryReader reader)
         {
             if (!PreReceive(reader))
-                return;
+                return default;
 
             short packetId = reader.ReadInt16();
 
             if (packetId <= 0)
             {
                 NonMappedPacketIdReceive(reader, packetId);
-                return;
+                return default;
             }
 
             var packet = (INetworkPacket)Activator.CreateInstance(_toType[packetId]);
@@ -83,6 +83,8 @@ namespace Webmilio.Commons.Networking.Resolver
 
             packet.Receive(this, reader);
             PostReceive(reader, packetId, packet);
+
+            return packet;
         }
 
 
