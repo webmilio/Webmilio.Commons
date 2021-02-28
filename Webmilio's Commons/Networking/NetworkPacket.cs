@@ -16,8 +16,8 @@ namespace Webmilio.Commons.Networking
             PostSend(resolver, writer);
         }
 
-        protected bool PreSend(INetworkPacketResolver resolver, BinaryWriter writer) => true;
-        protected void PostSend(INetworkPacketResolver resolver, BinaryWriter writer) { }
+        protected virtual bool PreSend(INetworkPacketResolver resolver, BinaryWriter writer) => true;
+        protected virtual void PostSend(INetworkPacketResolver resolver, BinaryWriter writer) { }
 
 
         public void Receive(INetworkPacketResolver resolver, BinaryReader reader)
@@ -30,8 +30,8 @@ namespace Webmilio.Commons.Networking
             PostReceive(resolver, reader);
         }
 
-        protected bool PreReceive(INetworkPacketResolver resolver, BinaryReader reader) => true;
-        protected void PostReceive(INetworkPacketResolver resolver, BinaryReader reader) { }
+        protected virtual bool PreReceive(INetworkPacketResolver resolver, BinaryReader reader) => true;
+        protected virtual void PostReceive(INetworkPacketResolver resolver, BinaryReader reader) { }
 
 
         [Ignore]
