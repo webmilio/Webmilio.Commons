@@ -5,33 +5,33 @@ namespace Webmilio.Commons.Networking
 {
     public abstract class NetworkPacket : INetworkPacket
     {
-        public void Send(INetworkPacketResolver resolver, object caller, BinaryWriter writer)
+        public void Send(INetworkPacketResolver resolver, BinaryWriter writer, object caller)
         {
-            if (!PreSend(resolver, caller, writer))
+            if (!PreSend(resolver, writer, caller))
                 return;
 
             writer.Write(Id);
             resolver.Mapper.GetMapping(GetType()).Write(this, writer);
 
-            PostSend(resolver, caller, writer);
+            PostSend(resolver, writer, caller);
         }
 
-        protected virtual bool PreSend(INetworkPacketResolver resolver, object instance, BinaryWriter writer) => true;
-        protected virtual void PostSend(INetworkPacketResolver resolver, object instance, BinaryWriter writer) { }
+        protected virtual bool PreSend(INetworkPacketResolver resolver, BinaryWriter writer, object caller) => true;
+        protected virtual void PostSend(INetworkPacketResolver resolver, BinaryWriter writer, object caller) { }
 
 
-        public void Receive(INetworkPacketResolver resolver, object caller, BinaryReader reader)
+        public void Receive(INetworkPacketResolver resolver, BinaryReader reader, object caller)
         {
-            if (!PreReceive(resolver, caller, reader))
+            if (!PreReceive(resolver, reader, caller))
                 return;
 
             resolver.Mapper.GetMapping(GetType()).Read(this, reader);
 
-            PostReceive(resolver, caller, reader);
+            PostReceive(resolver, reader, caller);
         }
 
-        protected virtual bool PreReceive(INetworkPacketResolver resolver, object caller, BinaryReader reader) => true;
-        protected virtual void PostReceive(INetworkPacketResolver resolver, object caller, BinaryReader reader) { }
+        protected virtual bool PreReceive(INetworkPacketResolver resolver, BinaryReader reader, object caller) => true;
+        protected virtual void PostReceive(INetworkPacketResolver resolver, BinaryReader reader, object caller) { }
 
 
         [Ignore]
