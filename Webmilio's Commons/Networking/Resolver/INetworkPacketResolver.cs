@@ -1,14 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using Webmilio.Commons.Networking.Resolver.Mapper;
+using Webmilio.Commons.Resolvers;
 
 namespace Webmilio.Commons.Networking.Resolver
 {
-    public interface INetworkPacketResolver
+    public interface INetworkPacketResolver : IResolver
     {
-        void Resolve(Assembly[] assemblies);
-
         short GetPacketId(Type type);
 
         void Send(BinaryWriter writer, INetworkPacket packet, object caller);

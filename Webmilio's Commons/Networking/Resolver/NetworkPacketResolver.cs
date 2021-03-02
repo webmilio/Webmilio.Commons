@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Webmilio.Commons.Extensions;
-using Webmilio.Commons.Extensions.Reflection;
 using Webmilio.Commons.Networking.Resolver.Mapper;
+using Webmilio.Commons.Resolvers;
 
 namespace Webmilio.Commons.Networking.Resolver
 {
-    public class NetworkPacketResolver : INetworkPacketResolver
+    public class NetworkPacketResolver : Resolver<INetworkPacket>, INetworkPacketResolver
     {
         public const short StartingPacketId = 1;
 
@@ -25,19 +24,14 @@ namespace Webmilio.Commons.Networking.Resolver
         }
 
 
-        public void Resolve(params Assembly[] assemblies)
+        protected override void Resolve(TypeInfo type)
         {
-            assemblies.Do(delegate (Assembly assembly)
-            {
-                assembly.DefinedTypes.Concrete<INetworkPacket>().Do(delegate (TypeInfo type)
-                {
-                    _toId.Add(type, _currentId);
-                    _toType.Add(_currentId++, type);
+            _toId.Add(type, _currentId);
+            _toType.Add(_currentId++, type);
 
-                    Mapper.Map(type);
-                });
-            });
+            Mapper.Map(type);
         }
+
 
         public short GetPacketId<T>() where T : INetworkPacket => GetPacketId(typeof(T));
 
