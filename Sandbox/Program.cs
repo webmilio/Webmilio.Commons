@@ -1,5 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Webmilio.Commons.DependencyInjection;
+using Webmilio.Commons.Extensions;
+using Webmilio.Commons.FChan;
+using Webmilio.Commons.Units;
 using WebmilioCommons.Sandbox.Networking;
 
 namespace WebmilioCommons.Sandbox
@@ -21,13 +28,33 @@ namespace WebmilioCommons.Sandbox
 
             services.GetService<NetworkingTest>().Run();
 
-            while (true)
-            {
+            for (int i = 0; i < 15; i++)
                 services.Make<NotAService>().Show();
-                Console.ReadLine();
-            }
+
+            //DoFChan().GetAwaiter().GetResult();
+
+            var vol = Volume.FromMilliliters(0.00492892257064842 * 1000);
+            typeof(Volume).GetProperties().Do(p => Console.WriteLine($"{p.Name}: {p.GetValue(vol)}"));
 
             Console.ReadLine();
+        }
+
+        private static async Task DoFChan()
+        {
+            var boards = await FChan.GetBoards();
+            Post post = default;
+
+            while (post == default)
+            {
+                var threads = await FChan.GetThreadsPageless(boards[RandomNumberGenerator.GetInt32(0, boards.Length)].board);
+
+                var thread = threads[RandomNumberGenerator.GetInt32(0, boards.Length)];
+                var posts = await FChan.GetPosts(thread.Board, thread.no);
+
+                post = posts.FirstOrDefault(p => p.AttachmentUrl != default);
+            }
+
+            Console.WriteLine(post.AttachmentUrl);
         }
     }
 
@@ -128,7 +155,7 @@ namespace WebmilioCommons.Sandbox
         public int Y { get; } = 10;
     }
 
-    [Service(ServiceType.Scoped)]
+    [Service(ServiceType.Transient)]
     internal class ScopedService
     {
         

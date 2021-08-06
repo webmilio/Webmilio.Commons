@@ -19,7 +19,7 @@ namespace WebmilioCommons.Sandbox.Networking
             var writer = new FakeBinaryWriter();
             var packet = new LoggedInPacket(45);
 
-            _resolver.Send(writer, packet);
+            _resolver.Send(writer, packet, this);
 
             var s = new MemoryStream();
             var bw = new BinaryWriter(s);
@@ -29,7 +29,7 @@ namespace WebmilioCommons.Sandbox.Networking
             bw.Flush();
             bw.BaseStream.Position = 0;
 
-            _resolver.Receive(new BinaryReader(s));
+            _resolver.Receive(new BinaryReader(s), this);
 
 
             s = new MemoryStream();
@@ -44,7 +44,7 @@ namespace WebmilioCommons.Sandbox.Networking
             bw.Flush();
             bw.BaseStream.Position = 0;
 
-            _resolver.Receive(new BinaryReader(s));
+            _resolver.Receive(new BinaryReader(s), this);
         }
     }
 }
