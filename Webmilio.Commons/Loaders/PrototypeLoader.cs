@@ -32,7 +32,7 @@ namespace Webmilio.Commons.Loaders
                 foreach (TypeInfo type in assembly.Concrete<T>())
                     if (LoadCondition(type))
                     {
-                        T instance = TypeHelpers.Instantiate<T>();
+                        T instance = type.Create<T>();
 
                         if (!PreAdd(type, ref instance))
                             continue;
