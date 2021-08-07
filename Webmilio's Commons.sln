@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{93
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Devices", "Devices", "{718B7D83-9EA1-4747-A521-9B9E6A7CA593}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webmilio.Commons.Console", "Webmilio.Commons.Console\Webmilio.Commons.Console.csproj", "{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,18 @@ Global
 		{6888C63A-A001-4D24-B3D3-656C77496942}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6888C63A-A001-4D24-B3D3-656C77496942}.Release|x64.ActiveCfg = Release|Any CPU
 		{6888C63A-A001-4D24-B3D3-656C77496942}.Release|x64.Build.0 = Release|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Debug|x64.Build.0 = Debug|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Release NS2.0|Any CPU.ActiveCfg = Release|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Release NS2.0|Any CPU.Build.0 = Release|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Release NS2.0|x64.ActiveCfg = Release|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Release NS2.0|x64.Build.0 = Release|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Release|x64.ActiveCfg = Release|Any CPU
+		{75EF6CBA-AA13-4FA8-87CA-4774A3AA80EE}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
