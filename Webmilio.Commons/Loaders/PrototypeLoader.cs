@@ -7,13 +7,13 @@ using Webmilio.Commons.Helpers;
 
 namespace Webmilio.Commons.Loaders
 {
-    public abstract class PrototypeLoader<T> : IDisposable
+    public class PrototypeLoader<T> : IDisposable
     {
         protected Dictionary<Type, int> generics;
         protected T[] instances;
 
 
-        protected PrototypeLoader()
+        public PrototypeLoader()
         {
             Initialize();
         }
