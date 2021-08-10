@@ -16,8 +16,13 @@ namespace Webmilio.Commons.Console
             var cc = System.Console.ForegroundColor;
             System.Console.ForegroundColor = ConsoleColor.Red;
 
-            System.Console.WriteLine(message);
+            System.Console.Error.WriteLine(message);
             System.Console.ForegroundColor = cc;
+        }
+
+        public static void WriteLineError(string format, params object[] args)
+        {
+            WriteLineError(string.Format(format, args));
         }
 
         public static async Task ListenToCommand(object origin)
