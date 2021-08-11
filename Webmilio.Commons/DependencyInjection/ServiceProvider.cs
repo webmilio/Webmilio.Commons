@@ -8,14 +8,16 @@ namespace Webmilio.Commons.DependencyInjection
 {
     public class ServiceProvider : IServiceProvider
     {
-        private readonly Dictionary<Type, Type> _map = new Dictionary<Type, Type>();
-        private readonly Dictionary<Type, object> _instances = new Dictionary<Type, object>();
-        private readonly Dictionary<Type, ConstructorInfo> _constructors = new Dictionary<Type, ConstructorInfo>();
+        private readonly Dictionary<Type, Type> _map = new();
+        private readonly Dictionary<Type, object> _instances = new();
 
-        private readonly Dictionary<Type, Func<ServiceProvider, object>> _factories = new Dictionary<Type, Func<ServiceProvider, object>>();
-        private readonly Dictionary<Type, bool> _isSingleton = new Dictionary<Type, bool>();
+        private readonly Dictionary<Type, ConstructorInfo> _constructors = new();
+        private readonly Dictionary<Type, List<InjectedProperty>> _properties = new();
 
-        private readonly List<IServiceProvider> _providers = new List<IServiceProvider>();
+        private readonly Dictionary<Type, Func<ServiceProvider, object>> _factories = new();
+        private readonly Dictionary<Type, bool> _isSingleton = new();
+
+        private readonly List<IServiceProvider> _providers = new();
 
 
         public ServiceProvider() : this(true)
@@ -177,16 +179,32 @@ namespace Webmilio.Commons.DependencyInjection
 
         private object MapConstructorAndMake(Type serviceType)
         {
+            object instance;
+
             if (_constructors.TryGetValue(serviceType, out var c))
-                return MakeFromConstructor(c);
+                instance = MakeFromConstructor(c);
+            else
+            {
+                var match = FindConstructor(serviceType);
 
-            var match = FindConstructor(serviceType);
+                if (match == default)
+                    throw new AmbiguousMatchException($"There are no constructors found which match the current available services for type {serviceType}.");
 
-            if (match == default)
-                throw new AmbiguousMatchException($"There are no constructors found which match the current available services for type {serviceType}.");
+                _constructors.Add(serviceType, match);
+                instance = MakeFromConstructor(match, match.GetParameters());
+            }
 
-            _constructors.Add(serviceType, match);
-            return MakeFromConstructor(match, match.GetParameters());
+
+            if (!_properties.TryGetValue(serviceType, out var properties))
+            {
+                properties = GetInjectedProperties(serviceType);
+                _properties.Add(serviceType, properties);
+            }
+
+            if (properties.Count > 0)
+                InjectProperties(instance, properties);
+
+            return instance;
         }
 
         private ConstructorInfo FindConstructor(Type serviceType)
@@ -219,6 +237,20 @@ namespace Webmilio.Commons.DependencyInjection
         private object MakeFromConstructor(ConstructorInfo constructor, ParameterInfo[] parameters)
         {
             return InjectServices(constructor, GetServices(parameters));
+        }
+
+
+        private void InjectProperties(object instance, List<InjectedProperty> properties)
+        {
+            properties.Do(ip =>
+            {
+                var service = GetService(ip.property.PropertyType);
+
+                if (service == default && ip.attribute.Required)
+                    throw new InvalidOperationException($"Service for property {ip.property.DeclaringType.Name}.{ip.property.Name} could not be acquired and property was marked as required.");
+
+                ip.property.SetValue(instance, service);
+            });
         }
 
 
@@ -293,7 +325,37 @@ namespace Webmilio.Commons.DependencyInjection
             return false;
         }
 
+        private List<InjectedProperty> GetInjectedProperties(Type serviceType)
+        {
+            var properties = serviceType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var injected = new List<InjectedProperty>(properties.Length);
+
+            properties.Do(p =>
+            {
+                var attribute = p.GetCustomAttribute<ServiceAttribute>();
+
+                if (attribute != default)
+                    injected.Add(new InjectedProperty(p, attribute));
+            });
+
+            return injected;
+        }
+
 
         public bool ServiceAttributeMapped { get; }
+
+
+        private struct InjectedProperty
+        {
+            public readonly PropertyInfo property;
+            public readonly ServiceAttribute attribute;
+
+
+            public InjectedProperty(PropertyInfo property, ServiceAttribute attribute)
+            {
+                this.property = property;
+                this.attribute = attribute;
+            }
+        }
     }
 }
