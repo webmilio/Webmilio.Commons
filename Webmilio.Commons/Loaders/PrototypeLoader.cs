@@ -13,12 +13,6 @@ namespace Webmilio.Commons.Loaders
         protected T[] instances;
 
 
-        public PrototypeLoader()
-        {
-            Initialize();
-        }
-
-
         public void Initialize()
         {
             if (!PreInitialize())
@@ -32,7 +26,7 @@ namespace Webmilio.Commons.Loaders
                 foreach (TypeInfo type in assembly.Concrete<T>())
                     if (LoadCondition(type))
                     {
-                        T instance = type.Create<T>();
+                        T instance = Create(type);
 
                         if (!PreAdd(type, ref instance))
                             continue;
@@ -49,6 +43,11 @@ namespace Webmilio.Commons.Loaders
 
 
             PostInitialize();
+        }
+
+        public virtual T Create(Type type)
+        {
+            return type.Create<T>();
         }
 
         public void Dispose()
