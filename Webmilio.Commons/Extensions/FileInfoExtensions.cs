@@ -35,7 +35,7 @@ namespace Webmilio.Commons.Extensions
             from.EnumerateFiles().DoEnumerable(f => f.CopyTo(to.CombineString(f.Name)));
 
             if (copySubDirectories)
-                from.EnumerateDirectories().DoEnumerable(d => d.CopyTo(to.CombineString(d.Name)));
+                from.EnumerateDirectories().DoEnumerable(d => d.CopyTo(to.Combine(d.Name), true));
         }
 #endregion
     }
