@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Webmilio.Commons.Extensions
 {
@@ -56,6 +57,12 @@ namespace Webmilio.Commons.Extensions
                 action(element);
         }
 
+        public static async Task DoEnumerableAsync<T>(this IEnumerable<T> source, Func<T, Task> action)
+        {
+            foreach (var element in source)
+                await action(element);
+        }
+
 
         public static void DoArray(this Array source, Action<object> action) => DoArray(source, (o, _) => action(o));
 
@@ -73,6 +80,17 @@ namespace Webmilio.Commons.Extensions
         {
             for (int i = 0; i < source.Count; i++)
                 action(source[i], i);
+        }
+
+
+        public static Task DoAsync<T>(this IList<T> source, Func<T, Task> action) => DoAsync(source, (t, i) => action(t));
+        public static Task DoAsync<T>(this IList<T> source, Func<T, int, Task> action) => DoAsync(source, 0, action);
+        public static Task DoAsync<T>(this IList<T> source, int startIndex, Func<T, Task> action) => DoAsync(source, startIndex, (t, i) => action(t));
+
+        public static async Task DoAsync<T>(this IList<T> source, int startIndex, Func<T, int, Task> action)
+        {
+            for (int i = 0; i < source.Count; i++)
+                await action(source[i], i);
         }
 
 
