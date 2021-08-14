@@ -18,5 +18,25 @@ namespace Webmilio.Commons.Extensions
 
             return path;
         }
+
+#region Folder Copy
+        // Expertly stolen from https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
+        public static void CopyTo(this DirectoryInfo from, string to) => CopyTo(from, to, false);
+        public static void CopyTo(this DirectoryInfo from, string to, bool copySubDirectories) => CopyTo(from, new DirectoryInfo(to), copySubDirectories);
+        public static void CopyTo(this DirectoryInfo from, DirectoryInfo to) => CopyTo(from, to, false);
+
+        public static void CopyTo(this DirectoryInfo from, DirectoryInfo to, bool copySubDirectories)
+        {
+            if (!from.Exists)
+                throw new DirectoryNotFoundException($"Directory `{from}` does not exist or could not be found.");
+
+            to.Create(); // Does nothing if it already exists.
+
+            from.EnumerateFiles().DoEnumerable(f => f.CopyTo(to.CombineString(f.Name)));
+
+            if (copySubDirectories)
+                from.EnumerateDirectories().DoEnumerable(d => d.CopyTo(to.CombineString(d.Name)));
+        }
+#endregion
     }
 }
