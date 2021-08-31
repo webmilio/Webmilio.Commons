@@ -10,7 +10,7 @@ namespace Tests.Webmilio.Commons.DependencyInjection
         [Test]
         public void AutoInjectProperty_Required()
         {
-            var services = new ServiceProvider();
+            var services = new ServiceCollection();
 
             services.AddSingleton<Class1>();
             services.AddSingleton<Class2>();
@@ -30,7 +30,7 @@ namespace Tests.Webmilio.Commons.DependencyInjection
         [Test]
         public void AutoInjectProperty_RequiredThrows()
         {
-            var services = new ServiceProvider();
+            var services = new ServiceCollection();
 
             services.AddSingleton<Class1>();
             services.AddSingleton<Class2>();

@@ -12,7 +12,7 @@ namespace Webmilio.Commons.Mapping
             return Map(origin, target);
         }
 
-        public static T Map<T>(object origin, ServiceProvider services)
+        public static T Map<T>(object origin, ServiceCollection services)
         {
             var target = services.Make<T>();
 

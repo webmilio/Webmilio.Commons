@@ -4,8 +4,8 @@ namespace Webmilio.Commons.Extensions
 {
     public static class FileInfoExtensions
     {
-        public static FileInfo Combine(this FileInfo fileInfo, params string[] paths) => new FileInfo(CombineString(fileInfo, paths));
-        public static DirectoryInfo Combine(this DirectoryInfo directoryInfo, params string[] paths) => new DirectoryInfo(CombineString(directoryInfo, paths));
+        public static FileInfo Combine(this FileInfo file, params string[] paths) => new FileInfo(CombineString(file, paths));
+        public static DirectoryInfo Combine(this DirectoryInfo directory, params string[] paths) => new(CombineString(directory, paths));
 
         public static string CombineString(this FileSystemInfo fsInfo, params string[] paths)
         {
@@ -19,7 +19,21 @@ namespace Webmilio.Commons.Extensions
             return path;
         }
 
-#region Folder Copy
+        #region Recreate
+
+        public static void Recreate(this DirectoryInfo directory) => Recreate(directory, false);
+
+        public static void Recreate(this DirectoryInfo directory, bool recursiveDelete)
+        {
+            if (directory.Exists)
+                directory.Delete(recursiveDelete);
+
+            directory.Create();
+        }
+
+        #endregion
+
+        #region Folder Copy
         // Expertly stolen from https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
         public static void CopyTo(this DirectoryInfo from, string to) => CopyTo(from, to, false);
         public static void CopyTo(this DirectoryInfo from, string to, bool copySubDirectories) => CopyTo(from, new DirectoryInfo(to), copySubDirectories);
@@ -37,6 +51,6 @@ namespace Webmilio.Commons.Extensions
             if (copySubDirectories)
                 from.EnumerateDirectories().DoEnumerable(d => d.CopyTo(to.Combine(d.Name), true));
         }
-#endregion
+        #endregion
     }
 }

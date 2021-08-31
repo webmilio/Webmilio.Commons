@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Linq;
 using System.Reflection;
 using Webmilio.Commons.Extensions;
 using Webmilio.Commons.Extensions.Reflection;
 
 namespace Webmilio.Commons.DependencyInjection
 {
-    public class ServiceProvider : IServiceProvider
+    public class ServiceCollection : IServiceContainer
     {
         private readonly Dictionary<Type, Type> _map = new();
         private readonly Dictionary<Type, object> _instances = new();
@@ -14,23 +16,24 @@ namespace Webmilio.Commons.DependencyInjection
         private readonly Dictionary<Type, ConstructorInfo> _constructors = new();
         private readonly Dictionary<Type, List<InjectedProperty>> _properties = new();
 
-        private readonly Dictionary<Type, Func<ServiceProvider, object>> _factories = new();
+        private readonly Dictionary<Type, Func<ServiceCollection, object>> _factories = new();
         private readonly Dictionary<Type, bool> _isSingleton = new();
 
         private readonly List<IServiceProvider> _providers = new();
+        private readonly List<IServiceContainer> _container = new();
 
 
-        public ServiceProvider() : this(true)
+        public ServiceCollection() : this(true)
         {
         }
 
-        public ServiceProvider(params ServiceProvider[] parents) : this(false, parents)
+        public ServiceCollection(params ServiceCollection[] parents) : this(false, parents)
         {
         }
 
-        public ServiceProvider(bool mapServiceAttribute, params ServiceProvider[] parents)
+        public ServiceCollection(bool mapServiceAttribute, params ServiceCollection[] parents)
         {
-            AddInstance(this);
+            AddService(this);
             ServiceAttributeMapped = mapServiceAttribute;
 
             for (int i = 0; i < parents.Length; i++)
@@ -60,11 +63,51 @@ namespace Webmilio.Commons.DependencyInjection
         }
 
 
-        public ServiceProvider AddSingleton<T>() => AddSingleton(typeof(T), null);
-        public ServiceProvider AddSingleton<T>(Func<ServiceProvider, T> factory) => AddSingleton(typeof(T), provider => factory(provider));
+        #region IServiceContainer
 
-        public ServiceProvider AddSingleton(Type serviceType) => AddSingleton(serviceType, null);
-        public ServiceProvider AddSingleton(Type serviceType, Func<ServiceProvider, object> factory)
+        public void AddService(Type serviceType, ServiceCreatorCallback callback)
+        {
+            AddSingleton(serviceType, c => callback(c, serviceType));
+        }
+
+        public void AddService(Type serviceType, ServiceCreatorCallback callback, bool promote)
+        {
+            AddService(serviceType, callback);
+
+            if (promote)
+                _container.Do(c => c.AddService(serviceType, callback, true));
+        }
+
+        public void AddService(Type serviceType, object serviceInstance)
+        {
+            _AddService(serviceType, serviceInstance);
+        }
+
+        public void AddService(Type serviceType, object serviceInstance, bool promote)
+        {
+            AddService(serviceType, serviceInstance);
+
+            _container.Do(c =>
+            {
+                c.AddService(serviceType, serviceInstance, promote);
+            });
+        }
+
+        public void RemoveService(Type serviceType, bool promote)
+        {
+            RemoveService(serviceType);
+
+            if (promote)
+                _container.Do(c => c.RemoveService(serviceType, promote));
+        }
+
+        #endregion
+
+        public ServiceCollection AddSingleton<T>() => AddSingleton(typeof(T), null);
+        public ServiceCollection AddSingleton<T>(Func<ServiceCollection, T> factory) => AddSingleton(typeof(T), provider => factory(provider));
+
+        public ServiceCollection AddSingleton(Type serviceType) => AddSingleton(serviceType, null);
+        public ServiceCollection AddSingleton(Type serviceType, Func<ServiceCollection, object> factory)
         {
             _factories.Add(serviceType, factory);
             _isSingleton.Add(serviceType, true);
@@ -74,30 +117,33 @@ namespace Webmilio.Commons.DependencyInjection
             return this;
         }
 
-        public ServiceProvider AddInstance<T>(T instance)
+        public ServiceCollection AddService<T>(T instance) => _AddService(typeof(T), instance);
+
+        private ServiceCollection _AddService(Type serviceType, object instance)
         {
-            _instances.Add(typeof(T), instance);
-            MapType(typeof(T));
+            _instances.Add(serviceType, instance);
+            MapType(serviceType);
 
             return this;
         }
 
-        public ServiceProvider AddTransient<T>() => AddTransient(typeof(T), null);
-        public ServiceProvider AddTransient<T>(Func<ServiceProvider, T> factory) => AddTransient(typeof(T), provider => factory(provider));
 
-        public ServiceProvider AddTransient(Type serviceType) => AddTransient(serviceType, null);
-        public ServiceProvider AddTransient(Type serviceType, Func<ServiceProvider, object> factory)
+        public ServiceCollection AddTransient<T>() => AddTransient(typeof(T), null);
+        public ServiceCollection AddTransient<T>(Func<ServiceCollection, T> factory) => AddTransient(typeof(T), provider => factory(provider));
+
+        public ServiceCollection AddTransient(Type serviceType) => AddTransient(serviceType, null);
+        public ServiceCollection AddTransient(Type serviceType, Func<ServiceCollection, object> factory)
         {
             _factories.Add(serviceType, factory);
             _isSingleton.Add(serviceType, false);
 
             MapType(serviceType);
-            
+
             return this;
         }
-        
 
-        public ServiceProvider AddProvider(IServiceProvider provider)
+
+        public ServiceCollection AddProvider(IServiceProvider provider)
         {
             if (provider == this)
                 throw new InvalidOperationException("A service provider cannot contain itself as a provider, only as a service.");
@@ -106,24 +152,28 @@ namespace Webmilio.Commons.DependencyInjection
             return this;
         }
 
-
-        public bool RemoveInstance<T>()
+        public ServiceCollection AddContainer(IServiceContainer container)
         {
-            return _map.TryGetValue(typeof(T), out var mapping) && _instances.Remove(mapping);
-        }
+            if (container == this)
+                throw new InvalidOperationException("A service container cannot contain itself as a container, only as a service.");
 
-        public bool RemoveInstance<T>(object instance)
-        {
-            if (!_map.TryGetValue(typeof(T), out var mapping))
-                return false;
-
-            if (!_instances.TryGetValue(mapping, out var iInstance))
-                return false;
-
-            return iInstance == instance && _instances.Remove(typeof(T));
+            _container.Add(container);
+            return AddProvider(container);
         }
 
 
+        public void RemoveService<T>()
+        {
+            RemoveService(typeof(T));
+        }
+
+        public void RemoveService(Type serviceType)
+        {
+            if (!_map.TryGetValue(serviceType, out var mapping))
+                return;
+            _instances.Remove(mapping);
+            _map.Remove(mapping);
+        }
 
         public T GetService<T>() => (T)GetService(typeof(T));
 
@@ -131,7 +181,7 @@ namespace Webmilio.Commons.DependencyInjection
         {
             object instance = default;
 
-            if (_map.TryGetValue(serviceType, out var mapping)) 
+            if (_map.TryGetValue(serviceType, out var mapping))
                 instance = GetOrMake(mapping);
 
             for (int i = 0; i < _providers.Count && instance == default; i++)
@@ -209,6 +259,11 @@ namespace Webmilio.Commons.DependencyInjection
 
         private ConstructorInfo FindConstructor(Type serviceType)
         {
+            return FindConstructor(serviceType, HasMapping);
+        }
+
+        internal static ConstructorInfo FindConstructor(Type serviceType, Func<Type, bool> mappingCheck)
+        {
             ParameterInfo[] matchParameters = default;
             ConstructorInfo match = default;
 
@@ -219,7 +274,7 @@ namespace Webmilio.Commons.DependencyInjection
 
                 for (int i = 0; i < parameters.Length && parameterMapped; i++)
                 {
-                    parameterMapped = HasMapping(parameters[i].ParameterType);
+                    parameterMapped = mappingCheck(parameters[i].ParameterType);
                 }
 
                 if (parameterMapped && (match == null || matchParameters.Length < parameters.Length))
@@ -317,7 +372,7 @@ namespace Webmilio.Commons.DependencyInjection
 
             for (int i = 0; i < _providers.Count; i++)
             {
-                if (_providers[i] is ServiceProvider sp && sp.HasMapping(serviceType)
+                if (_providers[i] is ServiceCollection sp && sp.HasMapping(serviceType)
                     || _providers[i].GetService(serviceType) != default)
                     return true;
             }
@@ -356,6 +411,45 @@ namespace Webmilio.Commons.DependencyInjection
                 this.property = property;
                 this.attribute = attribute;
             }
+        }
+    }
+
+    public static class ServiceProviderExtensions
+    {
+        public static object GetService<T>(this IServiceProvider provider)
+        {
+            if (provider is ServiceCollection sc)
+                return sc.GetService<T>();
+
+            return provider.GetService(typeof(T));
+        }
+
+        public static T Make<T>(this IServiceProvider provider) => (T) Make(provider, typeof(T));
+
+        public static object Make(this IServiceProvider provider, Type serviceType)
+        {
+            if (provider is ServiceCollection sc)
+                return sc.Make(serviceType);
+
+            var ctor = FindConstructable(provider, serviceType);
+
+            if (ctor == default)
+                return default;
+
+            var parameters = ctor.GetParameters();
+            var services = new object[parameters.Length];
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                services[i] = provider.GetService(parameters[i].ParameterType);
+            }
+
+            return ctor.Invoke(services);
+        }
+
+        public static ConstructorInfo FindConstructable(this IServiceProvider provider, Type serviceType)
+        {
+            return ServiceCollection.FindConstructor(serviceType, t => provider.GetService(t) != default);
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Webmilio.Commons
 {
     public class ThreadClock
     {
+        private volatile object _lock = new();
         public event Action Tick;
 
 

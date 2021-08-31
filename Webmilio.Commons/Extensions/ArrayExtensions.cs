@@ -139,5 +139,37 @@ namespace Webmilio.Commons.Extensions
                 source[n] = val;
             }
         }
+
+        public static short Sum<T>(this IList<T> source, Func<T, short> selector)
+        {
+            short v = 0;
+
+            source.Do(i => v += selector(i));
+            return v;
+        }
+
+        public static int Sum<T>(this IList<T> source, Func<T, int> selector)
+        {
+            int v = 0;
+
+            source.Do(i => v += selector(i));
+            return v;
+        }
+
+        public static float Sum<T>(this IList<T> source, Func<T, float> selector)
+        {
+            float v = 0;
+
+            source.Do(i => v += selector(i));
+            return v;
+        }
+
+        public static double Sum<T>(this IList<T> source, Func<T, double> selector)
+        {
+            double v = 0;
+
+            source.Do(i => v += selector(i));
+            return v;
+        }
     }
 }
