@@ -11,8 +11,10 @@
     <Authors>Webmilio</Authors>
     <PackageProjectUrl>https://github.com/webmilio/Webmilio.Commons</PackageProjectUrl>
     <RepositoryUrl>https://github.com/webmilio/Webmilio.Commons</RepositoryUrl>
-    <Version>1.0.0</Version>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Version>1.0.0.1</Version>
+	<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+	<Description>Collection of various utilities useful in almost any project.</Description>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,9 +26,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE">
+    <None Update="README.md">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 
