@@ -14,7 +14,7 @@ namespace Webmilio.Commons
         }
 
 
-        public void Start()
+        public virtual void Start()
         {
             Running = true;
 
@@ -22,7 +22,7 @@ namespace Webmilio.Commons
             Thread.Start();
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             Running = false;
         }
@@ -31,10 +31,14 @@ namespace Webmilio.Commons
         {
             while (Thread.IsAlive && Running)
             {
+                TickSynchronous();
                 Tick?.Invoke();
+
                 Thread.Sleep(TickRate);
             }
         }
+
+        protected virtual void TickSynchronous() { }
 
 
         public virtual int TickRate { get; set; } = 1000;
