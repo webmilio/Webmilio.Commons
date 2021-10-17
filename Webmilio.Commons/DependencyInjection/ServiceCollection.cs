@@ -275,6 +275,9 @@ namespace Webmilio.Commons.DependencyInjection
                 for (int i = 0; i < parameters.Length && parameterMapped; i++)
                 {
                     parameterMapped = mappingCheck(parameters[i].ParameterType);
+
+                    if (!parameterMapped)
+                        parameterMapped = parameters[i].IsOptional;
                 }
 
                 if (parameterMapped && (match == null || matchParameters.Length < parameters.Length))
@@ -314,7 +317,9 @@ namespace Webmilio.Commons.DependencyInjection
             var services = new object[parameters.Count];
 
             for (int i = 0; i < services.Length; i++)
+            {
                 services[i] = GetService(parameters[i].ParameterType);
+            }
 
             return services;
         }
@@ -416,40 +421,62 @@ namespace Webmilio.Commons.DependencyInjection
 
     public static class ServiceProviderExtensions
     {
-        public static object GetService<T>(this IServiceProvider provider)
+        private static readonly Dictionary<IServiceProvider, ServiceCollection> _collections = new();
+
+        public static T GetService<T>(this IServiceProvider services)
         {
-            if (provider is ServiceCollection sc)
+            if (services is ServiceCollection sc)
                 return sc.GetService<T>();
 
-            return provider.GetService(typeof(T));
+            return (T) services.GetService(typeof(T));
         }
 
-        public static T Make<T>(this IServiceProvider provider) => (T) Make(provider, typeof(T));
+        public static T GetRequiredService<T>(this IServiceProvider services)
+        {
+            var service = services.GetService<T>();
+
+            if (service == null)
+                throw new InvalidOperationException($"Service {typeof(T).Name} was not found.");
+
+            return service;
+        }
+
+        public static object GetRequiredService(this IServiceProvider services, Type serviceType)
+        {
+            var service = services.GetService(serviceType);
+
+            if (service == null)
+                throw new InvalidOperationException($"Service {serviceType.Name} was not found.");
+
+            return service;
+        }
+
+        public static T Make<T>(this IServiceProvider provider)
+        {
+            return GetCollection(provider).Make<T>();
+        }
 
         public static object Make(this IServiceProvider provider, Type serviceType)
         {
-            if (provider is ServiceCollection sc)
-                return sc.Make(serviceType);
-
-            var ctor = FindConstructable(provider, serviceType);
-
-            if (ctor == default)
-                return default;
-
-            var parameters = ctor.GetParameters();
-            var services = new object[parameters.Length];
-
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                services[i] = provider.GetService(parameters[i].ParameterType);
-            }
-
-            return ctor.Invoke(services);
+            return GetCollection(provider).Make(serviceType);
         }
 
-        public static ConstructorInfo FindConstructable(this IServiceProvider provider, Type serviceType)
+        public static IServiceContainer AddSingleton<T>(this IServiceContainer services)
         {
-            return ServiceCollection.FindConstructor(serviceType, t => provider.GetService(t) != default);
+            services.AddService(typeof(T), Make);
+
+            return services;
+        }
+
+        private static ServiceCollection GetCollection(IServiceProvider provider)
+        {
+            if (provider is ServiceCollection sc || _collections.TryGetValue(provider, out sc))
+                return sc;
+
+            sc = new ServiceCollection().AddProvider(provider);
+            _collections.Add(provider, sc);
+
+            return sc;
         }
     }
 }
