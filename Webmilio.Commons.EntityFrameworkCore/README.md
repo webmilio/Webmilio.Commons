@@ -1,0 +1,1 @@
+﻿Standard implementation of a DbContext using Commons.ComponentModel.
