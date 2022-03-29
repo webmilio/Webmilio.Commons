@@ -30,10 +30,13 @@ namespace Webmilio.Commons.Console
             // We wait for the user's input to kill the console.
             string input;
 
-            while (!(input = System.Console.ReadLine()).Equals("exit", StringComparison.CurrentCultureIgnoreCase))
+            do
             {
+                System.Console.Write("#> ");
+                input = System.Console.ReadLine();
+
                 await Execute(origin, input);
-            }
+            } while (!input.Equals("exit", StringComparison.CurrentCultureIgnoreCase));
         }
 
         public static async Task Execute(object origin, string input)

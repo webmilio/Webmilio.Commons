@@ -120,6 +120,31 @@ namespace Webmilio.Commons.Extensions
             }
         }
 
+        public static bool All<T>(this IList<T> source, Predicate<T> predicate)
+        {
+            for (int i = 0; i < source.Count; i++)
+            {
+                if (!predicate(source[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool Any<T>(this IList<T> source, Predicate<T> predicate)
+        {
+            for (int i = 0; i < source.Count; i++)
+            {
+                if (predicate(source[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public static void Shuffle<T>(this IList<T> source) => Shuffle(source, new Random());
 
@@ -171,5 +196,19 @@ namespace Webmilio.Commons.Extensions
             source.Do(i => v += selector(i));
             return v;
         }
+
+        public static void Move<T>(this IList<T> list, int source, int destination)
+        {
+            var item = list[source];
+            int direction = source > destination ? -1 : 1;
+
+            for (int i = source; i != destination; i += direction)
+                list[i] = list[i + direction];
+
+            list[destination] = item;
+        }
+
+        public static void Move<T>(this IList<T> list, T element, int destination) =>
+            Move(list, list.IndexOf(element), destination);
     }
 }

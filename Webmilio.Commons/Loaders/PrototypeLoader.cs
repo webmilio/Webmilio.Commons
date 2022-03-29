@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Webmilio.Commons.Extensions;
 using Webmilio.Commons.Extensions.Reflection;
 using Webmilio.Commons.Helpers;
 
@@ -73,6 +74,9 @@ namespace Webmilio.Commons.Loaders
 
         public IEnumerable<T> AsEnumerable() => instances.AsEnumerable();
 
+        public virtual void Do(Action<T> action) => instances.Do(action);
+        public virtual bool All(Predicate<T> predicate) => instances.All(predicate);
+        public virtual bool Any(Predicate<T> predicate) => instances.Any(predicate);
 
         public virtual Predicate<TypeInfo> LoadCondition { get; } = obj => true;
 

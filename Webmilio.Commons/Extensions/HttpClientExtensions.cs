@@ -26,7 +26,12 @@ namespace Webmilio.Commons.Extensions
             }
 
             using BinaryReader inputStream = new(await response.Content.ReadAsStreamAsync());
+
+#if RELEASE_NS2_0
+            using BinaryWriter outputStream = new(destination.Open(FileMode.Create));
+#else
             await using BinaryWriter outputStream = new(destination.Open(FileMode.Create));
+#endif
 
             bool shouldRead = true;
             while (shouldRead)
