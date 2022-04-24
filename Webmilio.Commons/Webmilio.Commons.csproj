@@ -1,34 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <RootNamespace>Webmilio.Commons</RootNamespace>
-    <AssemblyName>Webmilio.Commons</AssemblyName>
-    <LangVersion>latest</LangVersion>
-    <Platforms>AnyCPU;x64</Platforms>
-    <Configurations>Debug;Release;Debug - Auto;Release - No Auto;Release NS2.0</Configurations>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Authors>Webmilio</Authors>
-    <PackageProjectUrl>https://github.com/webmilio/Webmilio.Commons</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/webmilio/Webmilio.Commons</RepositoryUrl>
-    <Version>1.0.0.2</Version>
-	<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-	<Description>Collection of various utilities useful in almost any project.</Description>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<RootNamespace>Webmilio.Commons</RootNamespace>
+		<AssemblyName>Webmilio.Commons</AssemblyName>
+		<LangVersion>latest</LangVersion>
+		<Platforms>AnyCPU;x64</Platforms>
+		<Configurations>Debug;Release;Debug - Auto;Release - No Auto;Release NS2.0</Configurations>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Authors>Webmilio</Authors>
+		<PackageProjectUrl>https://github.com/webmilio/Webmilio.Commons</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/webmilio/Webmilio.Commons</RepositoryUrl>
+		<Version>1.0.0.3</Version>
+		<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+		<Description>Collection of various utilities useful in almost any project.</Description>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\Out</OutputPath>
-  </PropertyGroup>
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NS2.0|AnyCPU'">
-    <OutputPath>..\Out</OutputPath>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>..\Out</OutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Update="README.md">
-      <Pack>True</Pack>
-    </None>
-  </ItemGroup>
-
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NS2.0|AnyCPU'">
+		<OutputPath>..\Out</OutputPath>
+	</PropertyGroup>
 </Project>
