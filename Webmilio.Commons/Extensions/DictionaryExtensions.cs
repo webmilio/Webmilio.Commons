@@ -5,9 +5,9 @@ namespace Webmilio.Commons.Extensions;
 
 public static class DictionaryExtensions
 {
-    public static TV GetValueOrDefault<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, Func<TV> provider)
+    public static TV GetValueOrAdd<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, Func<TV> provider)
     {
-        TryGetValueOrDefault(dictionary, key, out var value, provider);
+        TryGetValueOrAdd(dictionary, key, out var value, provider);
         return value;
     }
 
@@ -19,7 +19,7 @@ public static class DictionaryExtensions
     /// <param name="value"></param>
     /// <param name="provider"></param>
     /// <returns><c>true</c> if the value was found; <c>false</c> if the value was acquired from the provider.</returns>
-    public static bool TryGetValueOrDefault<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, out TV value,
+    public static bool TryGetValueOrAdd<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, out TV value,
         Func<TV> provider)
     {
         if (dictionary.TryGetValue(key, out value))

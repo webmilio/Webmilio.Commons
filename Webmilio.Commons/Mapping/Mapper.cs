@@ -28,8 +28,6 @@ public class Mapper
         const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | 
                                    BindingFlags.SetProperty | BindingFlags.GetProperty;
 
-        _properties.GetValueOrDefault()
-
         var originProperties = origin.GetType().GetProperties(flags);
         var targetProperties = typeof(T).GetProperties(flags);
 
