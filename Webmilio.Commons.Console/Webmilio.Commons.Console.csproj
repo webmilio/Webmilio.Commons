@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -10,8 +10,7 @@
 	<RepositoryUrl>https://github.com/webmilio/Webmilio.Commons</RepositoryUrl>
 	<Version>1.0</Version>
 	<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-	<Description>Collection of various utilities useful in almost any project.</Description>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<Description>Collection of various utilities useful in console applications.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
