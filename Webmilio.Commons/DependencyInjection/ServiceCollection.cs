@@ -227,6 +227,18 @@ namespace Webmilio.Commons.DependencyInjection
             return default;
         }
 
+        public IEnumerable<T> Make<T>(IEnumerable<TypeInfo> types)
+        {
+            foreach (var type in types)
+                yield return (T) Make(type);
+        }
+
+        public IEnumerable<object> Make(IEnumerable<TypeInfo> types)
+        {
+            foreach (var type in types)
+                yield return Make(type);
+        }
+
         private object MapConstructorAndMake(Type serviceType)
         {
             object instance;
@@ -451,15 +463,10 @@ namespace Webmilio.Commons.DependencyInjection
             return service;
         }
 
-        public static T Make<T>(this IServiceProvider provider)
-        {
-            return GetCollection(provider).Make<T>();
-        }
-
-        public static object Make(this IServiceProvider provider, Type serviceType)
-        {
-            return GetCollection(provider).Make(serviceType);
-        }
+        public static T Make<T>(this IServiceProvider provider) => GetCollection(provider).Make<T>();
+        public static object Make(this IServiceProvider provider, Type type) => GetCollection(provider).Make(type);
+        public static IEnumerable<T> Make<T>(this IServiceProvider provider, IEnumerable<TypeInfo> types) => GetCollection(provider).Make<T>(types);
+        public static IEnumerable<object> Make(this IServiceProvider provider, IEnumerable<TypeInfo> types) => GetCollection(provider).Make(types);
 
         public static IServiceContainer AddSingleton<T>(this IServiceContainer services)
         {

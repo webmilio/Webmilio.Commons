@@ -4,6 +4,14 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Configurations>Debug;Release;Release NS2.0</Configurations>
+	<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+	<Authors>Webmilio</Authors>
+	<PackageProjectUrl>https://github.com/webmilio/Webmilio.Commons</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/webmilio/Webmilio.Commons</RepositoryUrl>
+	<Version>1.0</Version>
+	<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+	<Description>Collection of various utilities useful in almost any project.</Description>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -13,5 +21,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NS2.0|AnyCPU'">
     <OutputPath>..\Out</OutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Webmilio.Commons\Webmilio.Commons.csproj" />
+  </ItemGroup>
 
 </Project>

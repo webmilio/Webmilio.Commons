@@ -54,20 +54,16 @@ namespace Webmilio.Commons.Extensions.Reflection
             return (T) Create(type, args);
         }
 
-        public static object[] Create(this IList<TypeInfo> types)
+        public static IEnumerable<object> Create(this IEnumerable<TypeInfo> types)
         {
-            var objects = new object[types.Count];
-
-            types.Do((t, i) => objects[i] = t.Create());
-            return objects;
+            foreach (var type in types)
+                yield return type.Create();
         }
 
-        public static T[] Create<T>(this IList<TypeInfo> types)
+        public static IEnumerable<T> Create<T>(this IEnumerable<TypeInfo> types)
         {
-            var objects = new T[types.Count];
-
-            types.Do((t, i) => objects[i] = t.Create<T>());
-            return objects;
+            foreach (var type in types)
+                yield return type.Create<T>();
         }
     }
 }

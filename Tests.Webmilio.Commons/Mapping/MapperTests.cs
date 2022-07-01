@@ -10,7 +10,7 @@ namespace Tests.Webmilio.Commons.Mapping
         public void SameValues_AreEqual()
         {
             var sc = new TestClasses.SmallClass();
-            var sc2 = Mapper.Map<TestClasses.SmallClass2>(sc);
+            var sc2 = Mapper.Common.Map<TestClasses.SmallClass2>(sc);
 
             Assert.Multiple(() =>
             {
