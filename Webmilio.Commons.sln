@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.Mathematic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Webmilio.Commons.Mathematics", "Tests.Webmilio.Commons.Mathematics\Tests.Webmilio.Commons.Mathematics.csproj", "{6A3ECC03-41F7-4917-A176-35D3B1909AD7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Webmilio.Commons.Console", "Tests.Webmilio.Commons.Console\Tests.Webmilio.Commons.Console.csproj", "{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug - Auto|Any CPU = Debug - Auto|Any CPU
@@ -217,6 +219,26 @@ Global
 		{6A3ECC03-41F7-4917-A176-35D3B1909AD7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6A3ECC03-41F7-4917-A176-35D3B1909AD7}.Release|x64.ActiveCfg = Release|Any CPU
 		{6A3ECC03-41F7-4917-A176-35D3B1909AD7}.Release|x64.Build.0 = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Debug - Auto|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Debug - Auto|Any CPU.Build.0 = Debug|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Debug - Auto|x64.ActiveCfg = Debug|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Debug - Auto|x64.Build.0 = Debug|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Debug|x64.Build.0 = Debug|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release - No Auto|Any CPU.ActiveCfg = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release - No Auto|Any CPU.Build.0 = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release - No Auto|x64.ActiveCfg = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release - No Auto|x64.Build.0 = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release NS2.0|Any CPU.ActiveCfg = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release NS2.0|Any CPU.Build.0 = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release NS2.0|x64.ActiveCfg = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release NS2.0|x64.Build.0 = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release|x64.ActiveCfg = Release|Any CPU
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -224,6 +246,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{15866B09-6A90-495C-B83D-5937D6ECA2A1} = {CDDC74A4-D9BD-4C31-A9A6-344C4E436567}
 		{6A3ECC03-41F7-4917-A176-35D3B1909AD7} = {CDDC74A4-D9BD-4C31-A9A6-344C4E436567}
+		{1B1CBB04-F6AB-45DB-B0C3-9251D23E10A1} = {CDDC74A4-D9BD-4C31-A9A6-344C4E436567}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {182121C6-CDE8-4704-BFC5-F15E83FAB3E7}

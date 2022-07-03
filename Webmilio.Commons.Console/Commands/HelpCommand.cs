@@ -30,7 +30,7 @@ public class HelpCommand : Command
 
             if (command == default)
             {
-                ConsoleHelper.CommandNotFound(args[1]);
+                ConsoleHandler.CommandNotFound(args[1]);
                 return Task.CompletedTask;
             }
 

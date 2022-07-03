@@ -8,6 +8,19 @@ namespace Webmilio.Commons.Extensions
 {
     public static class ArrayExtensions
     {
+        public static string Join<T>(this IList<T> items, string separator, Func<T, string> selector) =>
+        Join<T>(items, separator, selector, 0, items.Count);
+
+        public static string Join<T>(this IList<T> items, string separator, Func<T, string> selector, int startIndex, int length)
+        {
+            var values = new string[length];
+
+            for (int i = 0; i < length; i++)
+                values[i] = selector(items[i + startIndex]);
+
+            return string.Join(separator, values);
+        }
+
         public static List<string> RemakeEnumerableWithContinuation(this IEnumerable<string> strings, char continuousChar = '"', char seperatorChar = ' ')
         {
             string fullString = string.Join(seperatorChar.ToString(), strings);

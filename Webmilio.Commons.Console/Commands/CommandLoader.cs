@@ -29,7 +29,7 @@ public class CommandLoader
 
     public async Task<bool> Execute(object sender, string input, string cmd, string[] args)
     {
-        var command = GetCommand(cmd);
+        var command = GetCommand(cmd, );
 
         if (command == default)
             return false;
@@ -41,9 +41,11 @@ public class CommandLoader
         return true;
     }
 
-    public Command GetCommand(string name)
+    public Command GetCommand(string name, out string processed)
     {
-        var generic = _generics.FirstOrDefault(command => command.IsCommand(name));
+        processed = name;
+
+        var generic = _generics.FirstOrDefault(command => command.IsCommand(name, out processed));
         if (generic == null) return null;
 
         return _services.Make(generic.GetType()) as Command;

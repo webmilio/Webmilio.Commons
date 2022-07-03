@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Webmilio.Commons.Console.Commands;
 
 namespace Webmilio.Commons.Console;
 
-public class ConsoleHelper
+public class ConsoleHandler
 {
     private readonly CommandLoader _commands;
 
-    public ConsoleHelper(CommandLoader commands)
+    public ConsoleHandler(CommandLoader commands)
     {
         _commands = commands;
     }
@@ -32,18 +33,22 @@ public class ConsoleHelper
         WriteLineError(string.Format(format, args));
     }
 
+    protected virtual void PreListen() => System.Console.Write("#> ");
+
+    public async Task ListenToCommands(object origin, CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+            await ListenToCommand(origin);
+    }
+
+    public Task ListenToCommands(object origin) => ListenToCommands(origin, CancellationToken.None);
+
     public async Task ListenToCommand(object origin)
     {
-        // We wait for the user's input to kill the console.
-        string input;
+        PreListen();
+        var input = System.Console.ReadLine();
 
-        do
-        {
-            System.Console.Write("#> ");
-            input = System.Console.ReadLine();
-
-            await Execute(origin, input);
-        } while (!input.Equals("exit", StringComparison.CurrentCultureIgnoreCase));
+        await Execute(origin, input);
     }
 
     public async Task Execute(object origin, string input)
