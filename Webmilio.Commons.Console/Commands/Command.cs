@@ -18,7 +18,7 @@ public abstract class Command
     {
         if (str.Equals(Name, StringComparison.InvariantCultureIgnoreCase))
         {
-            processed = str[(Name.Length - 1)..];
+            // processed = str[(Name.Length - 1)..];
             return true;
         }
 
@@ -28,12 +28,12 @@ public abstract class Command
 
             if (str.Equals(alias, StringComparison.InvariantCultureIgnoreCase))
             {
-                processed = str[(alias.Length - 1)..];
+                // processed = str[(alias.Length - 1)..];
                 return true;
             }
         }
 
-        processed = str;
+        // processed = str;
         return false;
     }
 

@@ -21,8 +21,4 @@
     <OutputPath>..\Out</OutputPath>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Webmilio.Commons\Webmilio.Commons.csproj" />
-  </ItemGroup>
-
 </Project>
