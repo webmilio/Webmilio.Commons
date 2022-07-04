@@ -11,10 +11,10 @@ public abstract class Command
         Aliases = aliases;
     }
 
-
+    public virtual bool CanExecute(object sender, string input, string[] args) => true;
     public abstract Task Execute(object sender, string input, string[] args);
 
-    public bool IsCommand(string str, ref string[] args)
+    public bool IsCommand(string str)
     {
         if (str.Equals(Name, StringComparison.InvariantCultureIgnoreCase))
         {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Webmilio.Commons.Console.Commands;
 using Webmilio.Commons.DependencyInjection;
 using Webmilio.Commons.Extensions.Reflection;
 
@@ -29,7 +28,7 @@ public class CommandLoader
 
     public async Task<bool> Execute(object sender, string input, string cmd, string[] args)
     {
-        var command = GetCommand(cmd, );
+        var command = GetCommand(cmd);
 
         if (command == default)
             return false;
@@ -37,15 +36,16 @@ public class CommandLoader
         if (args.Length - 1 < command.RequiredArgsCount)
             throw new CommandExecutionException($"Incorrect amount of parameters specified:\n{HelpCommand.spacing}Usage: {command.Usage}\nFor more information about this command, do help/? <command>");
 
+        if (!command.CanExecute(sender, input, args))
+            return false;
+
         await command?.Execute(sender, input, args);
         return true;
     }
 
-    public Command GetCommand(string name, out string processed)
+    public Command GetCommand(string name)
     {
-        processed = name;
-
-        var generic = _generics.FirstOrDefault(command => command.IsCommand(name, out processed));
+        var generic = _generics.FirstOrDefault(command => command.IsCommand(name));
         if (generic == null) return null;
 
         return _services.Make(generic.GetType()) as Command;
