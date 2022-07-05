@@ -22,14 +22,17 @@ public abstract class Command
             return true;
         }
 
-        for (int i = 0; i < Aliases.Length; i++)
+        if (Aliases != null)
         {
-            var alias = Aliases[i];
-
-            if (str.Equals(alias, StringComparison.InvariantCultureIgnoreCase))
+            for (int i = 0; i < Aliases.Length; i++)
             {
-                // processed = str[(alias.Length - 1)..];
-                return true;
+                var alias = Aliases[i];
+
+                if (str.Equals(alias, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    // processed = str[(alias.Length - 1)..];
+                    return true;
+                }
             }
         }
 
