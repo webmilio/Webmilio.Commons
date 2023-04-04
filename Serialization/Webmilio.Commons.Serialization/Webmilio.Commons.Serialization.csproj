@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+	<LangVersion>latest</LangVersion>
+	<Authors>Webmilio</Authors>
+	<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+	<Version>1.0.1</Version>
+	<RepositoryUrl>https://github.com/webmilio/Webmilio.Commons</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Webmilio.Commons\Webmilio.Commons.csproj" />
+    <ProjectReference Include="..\Webmilio.Commons.Serialization.Abstraction\Webmilio.Commons.Serialization.Abstraction.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
 
-namespace Webmilio.Commons.Configurations
+namespace Webmilio.Commons.Configurations;
+
+public abstract class Configuration
 {
-    public abstract class Configuration<T> where T : Configuration<T>
+    protected Configuration()
     {
-        protected Configuration()
-        {
-        }
-
-
-        public abstract Task Save(string path);
     }
+
+
+    public abstract Task Save(string path);
 }
