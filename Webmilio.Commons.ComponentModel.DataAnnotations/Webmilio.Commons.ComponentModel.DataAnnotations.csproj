@@ -13,14 +13,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>EntityFramework</PackageTags>
     <SignAssembly>False</SignAssembly>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\Out</OutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NS2.0|AnyCPU'">
-    <OutputPath>..\Out</OutputPath>
+	<BaseOutputPath>..\Out</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,31 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Webmilio.Commons.Extensions;
 using Webmilio.Commons.Extensions.Reflection;
 
-namespace Webmilio.Commons.Resolvers
+namespace Webmilio.Commons.Resolvers;
+
+public class TypeResolver<T> : IResolver<Type>
 {
-    public abstract class TypeResolver<T> : IResolver<TypeInfo>
+    public virtual IList<Type> Resolve(IList<Assembly> assemblies)
     {
-        public virtual IList<TypeInfo> Resolve(IList<Assembly> assemblies)
+        var resolved = new List<Type>();
+
+        foreach (var assembly in assemblies)
         {
-            var types = new List<TypeInfo>();
+            var types = assembly.GetTypes().Concrete<T>();
+            resolved.AddRange(types);
 
-            assemblies.Do(delegate (Assembly assembly)
+            foreach (var type in types)
             {
-                var t = assembly.DefinedTypes.Concrete<T>();
-                types.AddRange(t);
-
-                t.DoEnumerable(Resolve);
-            });
-
-            PostResolve(assemblies, types);
-            return types;
+                Resolve(type);
+            }
         }
 
-
-        protected virtual void Resolve(TypeInfo type) { }
-
-        protected virtual void PostResolve(IList<Assembly> assemblies, List<TypeInfo> types) { }
+        PostResolve(assemblies, resolved);
+        return resolved;
     }
+
+
+    protected virtual void Resolve(Type type) { }
+
+    protected virtual void PostResolve(IList<Assembly> assemblies, List<Type> types) { }
 }

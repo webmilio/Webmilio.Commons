@@ -11,38 +11,35 @@ using Webmilio.Commons.Extensions;
 
 namespace Webmilio.Commons.EntityFrameworkCore
 {
-    public class DbContext<T> : DbContext where T : DbContext<T>
+    public class DbContext : Microsoft.EntityFrameworkCore.DbContext
     {
-        public DbContext(DbContextOptions<T> options) : base(options)
+        public DbContext()
         {
         }
 
-
-        public Task Initialize()
+        public DbContext(DbContextOptions options) : base(options)
         {
-            return Database.EnsureCreatedAsync();
         }
-
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             ApplyAnnotationAttributes(builder);
 
-            ModModelCreating(builder);
+            ModelCreating(builder);
         }
 
-        protected virtual void ModModelCreating(ModelBuilder builder)
+        protected virtual void ModelCreating(ModelBuilder builder)
         {
         }
 
         protected virtual void ApplyAnnotationAttributes(ModelBuilder builder)
         {
-            builder.Model.GetEntityTypes().DoEnumerable(delegate(IMutableEntityType et)
+            builder.Model.GetEntityTypes().DoEnumerable(delegate (IMutableEntityType et)
             {
                 List<AnnotationAttribute> entityAttributes = new();
                 Dictionary<string, object> entityMetadata = new();
 
-                et.GetProperties().DoEnumerable(delegate(IMutableProperty p)
+                et.GetProperties().DoEnumerable(delegate (IMutableProperty p)
                 {
                     if (p.PropertyInfo == default)
                         return;
@@ -73,7 +70,7 @@ namespace Webmilio.Commons.EntityFrameworkCore
                 });
 
                 entityAttributes.Do(ea => ea.PostEntityLoop(et.ClrType, entityMetadata));
-                entityAttributes.Do(delegate(AnnotationAttribute attribute)
+                entityAttributes.Do(delegate (AnnotationAttribute attribute)
                 {
                     if (attribute.EntityMetadatas == default)
                     {
@@ -81,7 +78,7 @@ namespace Webmilio.Commons.EntityFrameworkCore
                     }
 
                     DoKeyList(attribute.EntityMetadatas.Keys, et, (t, p) => t.SetPrimaryKey(p));
-                    DoKeyList(attribute.EntityMetadatas.AlternateKeys, et, (t, p) => 
+                    DoKeyList(attribute.EntityMetadatas.AlternateKeys, et, (t, p) =>
                         p.Do(x => t.AddKey(x)));
                 });
             });
@@ -99,5 +96,12 @@ namespace Webmilio.Commons.EntityFrameworkCore
         }
 
         private delegate void KeyAction(IMutableEntityType entityType, List<IMutableProperty> properties);
+    }
+
+    public class DbContext<T> : DbContext where T : DbContext<T>
+    {
+        public DbContext(DbContextOptions<T> options) : base(options)
+        {
+        }
     }
 }

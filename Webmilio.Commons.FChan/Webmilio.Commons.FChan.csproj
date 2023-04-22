@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Configurations>Debug;Release;Release NS2.0</Configurations>
+	<BaseOutputPath>..\Out</BaseOutputPath>
   </PropertyGroup>
 
 </Project>

@@ -39,7 +39,7 @@ public class MatrixDouble : Matrix<double>
 
                 // Calculate and Store.
                 double sum = 0;
-                
+
                 int sign = 1;
                 int upperBound = Columns - 1;
 

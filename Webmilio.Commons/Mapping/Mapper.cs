@@ -46,8 +46,8 @@ public class Mapper
         const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | 
                                    BindingFlags.SetProperty | BindingFlags.GetProperty;
 
-        var originProperties = _properties.GetValueOrAdd(origin.GetType(), () => origin.GetType().GetProperties(flags));
-        var targetProperties = _properties.GetValueOrAdd(typeof(T), () => target.GetType().GetProperties(flags));
+        var originProperties = _properties.GetValueOrAdd(origin.GetType(), t => t.GetProperties(flags));
+        var targetProperties = _properties.GetValueOrAdd(typeof(T), t => t.GetProperties(flags));
 
         foreach (var tp in targetProperties)
         {

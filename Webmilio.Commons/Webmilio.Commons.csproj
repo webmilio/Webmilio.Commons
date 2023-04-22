@@ -6,12 +6,11 @@
 		<AssemblyName>Webmilio.Commons</AssemblyName>
 		<LangVersion>latest</LangVersion>
 		<Platforms>AnyCPU;x64</Platforms>
-		<Configurations>Debug;Release;Debug - Auto;Release - No Auto;Release NS2.0</Configurations>
+		<Configurations>Debug;Release</Configurations>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<Authors>Webmilio</Authors>
-		<PackageProjectUrl>https://github.com/webmilio/Webmilio.Commons</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/webmilio/Webmilio.Commons</RepositoryUrl>
-		<Version>1.2</Version>
+		<Version>1.3.1</Version>
 		<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
 		<Description>Collection of various utilities useful in almost any project.</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -21,11 +20,9 @@
 		<None Include="README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<OutputPath>..\Out</OutputPath>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NS2.0|AnyCPU'">
-		<OutputPath>..\Out</OutputPath>
-	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\DependencyInjection\Webmilio.Commons.DependencyInjection\Webmilio.Commons.DependencyInjection.csproj" />
+	  <ProjectReference Include="..\Webmilio.Commons.Abstractions\Webmilio.Commons.Abstractions.csproj" />
+	  <ProjectReference Include="..\Webmilio.Commons.Extensions\Webmilio.Commons.Extensions.csproj" />
+	</ItemGroup>
 </Project>
