@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\DependencyInjection\Webmilio.Commons.DependencyInjection\Webmilio.Commons.DependencyInjection.csproj" />
+	  <ProjectReference Include="..\DependencyInjection\Webmilio.Commons.DependencyInjection.Abstractions\Webmilio.Commons.DependencyInjection.Abstractions.csproj" />
 	  <ProjectReference Include="..\Webmilio.Commons.Abstractions\Webmilio.Commons.Abstractions.csproj" />
 	  <ProjectReference Include="..\Webmilio.Commons.Extensions\Webmilio.Commons.Extensions.csproj" />
 	</ItemGroup>
