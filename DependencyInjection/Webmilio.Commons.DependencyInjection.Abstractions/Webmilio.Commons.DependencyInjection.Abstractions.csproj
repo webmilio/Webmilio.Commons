@@ -12,4 +12,8 @@
 	<RepositoryUrl>https://github.com/webmilio/Webmilio.Commons</RepositoryUrl>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
 </Project>

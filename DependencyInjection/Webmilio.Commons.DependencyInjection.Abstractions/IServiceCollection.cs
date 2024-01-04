@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.ComponentModel.Design;
 
 namespace Webmilio.Commons.DependencyInjection;
 
-public interface IServiceCollection : IServiceContainer
+public interface IServiceCollection : Microsoft.Extensions.DependencyInjection.IServiceCollection, 
+    IServiceContainer, IServiceFactory, ISupportRequiredService
 {
-    public object Make(Type serviceType);
 }
