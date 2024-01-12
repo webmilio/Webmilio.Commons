@@ -13,7 +13,7 @@ namespace Webmilio.Commons.Extensions.Reflection
         {
             foreach (var type in types.Concrete())
             {
-                if (type.IsSubclassOf(typeof(T)))
+                if (typeof(T).IsAssignableFrom(type))
                 {
                     yield return type;
                 }

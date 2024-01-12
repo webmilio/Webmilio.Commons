@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Webmilio.Commons.Extensions.Reflection;
@@ -14,7 +13,7 @@ public class ServiceCollection : IServiceCollection
 {
     public class CacheProperties
     {
-        public bool CacheConstructor { get; set; } = true;
+        public bool CacheConstructorOnGetService { get; set; } = true;
 
         public bool InvalidateOnServiceRegistrationChange { get; set; }
         public bool CalculateOnRegistration { get; set; }
@@ -22,10 +21,14 @@ public class ServiceCollection : IServiceCollection
 
     public class MappingProperties
     {
+        public bool CacheConstructorOnMapping { get; set; }
+
         public MappingBehavior MappingBehavior { get; set; } = MappingBehavior.All;
+
+        public BindingFlags ConstructorFlags { get; set; } = BindingFlags.Instance | BindingFlags.Public;
     }
 
-    protected readonly Dictionary<Type, Type> typeMappings = [];
+    protected readonly Dictionary<Type, Type> mappings = [];
     protected readonly Dictionary<Type, ServiceDescriptor> descriptors = [];
 
     protected readonly Dictionary<Type, ServiceDescriptor> services = [];
@@ -69,13 +72,27 @@ public class ServiceCollection : IServiceCollection
 
     private void Add(Type rootType, ServiceDescriptor item)
     {
-        item = MapDescriptor(item);
-        descriptors.TryAdd(rootType, item);
+        MapType(rootType, rootType);
 
-        if (Caching.InvalidateOnServiceRegistrationChange)
+        // Implies that the item is a singleton.
+        if (item.ImplementationInstance != null)
         {
-            UpdateRegistrations();
+            services.Add(rootType, item);
         }
+        else
+        {
+            if (Mapping.CacheConstructorOnMapping)
+            {
+                item = CreateDescriptorFromConstructor(item, []);
+            }
+
+            if (Caching.InvalidateOnServiceRegistrationChange)
+            {
+                UpdateRegistrations();
+            }
+        }
+
+        descriptors.TryAdd(rootType, item);
     }
 
     public void Insert(int index, ServiceDescriptor item)
@@ -88,8 +105,8 @@ public class ServiceCollection : IServiceCollection
     public void RemoveService(Type serviceType)
     {
         var toRemove = new List<Type>();
-        
-        foreach (var kvp in typeMappings)
+
+        foreach (var kvp in mappings)
         {
             if (kvp.Value == serviceType)
             {
@@ -99,7 +116,7 @@ public class ServiceCollection : IServiceCollection
 
         for (int i = 0; i < toRemove.Count; i++)
         {
-            typeMappings.Remove(toRemove[i]);
+            mappings.Remove(toRemove[i]);
         }
 
         descriptors.Remove(serviceType);
@@ -132,14 +149,15 @@ public class ServiceCollection : IServiceCollection
     #region Getting
     public object GetService(Type serviceType)
     {
-        if (!typeMappings.TryGetValue(serviceType, out var realServiceType))
+        if (!mappings.TryGetValue(serviceType, out var realServiceType))
         {
             throw new ServiceNotFoundException($"No mapping found for service type {serviceType}.");
         }
 
-        if (services.TryGetValue(realServiceType, out var descriptor) && 
+        if (services.TryGetValue(realServiceType, out var descriptor) &&
             descriptor.ImplementationInstance != null)
         {
+            // An instance is already defined, return it.
             return descriptor.ImplementationInstance;
         }
 
@@ -149,11 +167,22 @@ public class ServiceCollection : IServiceCollection
             throw new ServiceNotFoundException($"No service descriptor registered for service type {realServiceType}/{serviceType}.");
         }
 
-        var instance = Make(serviceType);
-        
-        if (descriptor.Lifetime == ServiceLifetime.Singleton)
+        return GetService(realServiceType, descriptor);
+    }
+
+    private object GetService(Type type, ServiceDescriptor descriptor)
+    {
+        if (descriptor.ImplementationFactory == null)
         {
-            services.Add(realServiceType, new ServiceDescriptor(realServiceType, instance));
+            // We don't know how to 
+            descriptor = CreateDescriptorFromConstructor(descriptor);
+        }
+
+        var instance = GetOrMake(descriptor);
+
+        if (Caching.CacheConstructorOnGetService && descriptor.Lifetime == ServiceLifetime.Singleton)
+        {
+            services.Add(type, new ServiceDescriptor(type, instance));
         }
 
         return instance;
@@ -170,6 +199,8 @@ public class ServiceCollection : IServiceCollection
 
         return service;
     }
+
+    public object GetService(ServiceDescriptor descriptor) => GetService(descriptor.ServiceType, descriptor);
     #endregion
 
     #region Other
@@ -180,19 +211,19 @@ public class ServiceCollection : IServiceCollection
 
     public void Clear()
     {
-        typeMappings.Clear();
+        mappings.Clear();
         descriptors.Clear();
         services.Clear();
     }
 
     public bool Contains(ServiceDescriptor item)
     {
-        return typeMappings.ContainsKey(item.ServiceType);
+        return mappings.ContainsKey(item.ServiceType);
     }
 
     public bool Contains(Type serviceType)
     {
-        return typeMappings.ContainsKey(serviceType);
+        return mappings.ContainsKey(serviceType);
     }
 
     public void CopyTo(ServiceDescriptor[] dst, int arrayIndex)
@@ -217,54 +248,37 @@ public class ServiceCollection : IServiceCollection
     #endregion
 
     #region Mapping
-    private static ConstructorInfo? FindConstructor(Type serviceType, List<Type> serviceTypes)
+    private List<Type> GetAvailableTypes()
     {
-        ConstructorInfo? ctr = null;
-        ParameterInfo[]? parameters = null;
-
-        foreach (var mCtr in serviceType.GetConstructors())
-        {
-            var mParameters = mCtr.GetParameters();
-
-            int i;
-            for (i = 0; i < mParameters.Length && serviceTypes.Contains(mParameters[i].ParameterType); i++) ;
-
-            if (parameters == null ||
-                i + 1 == mParameters.Length && mParameters.Length > parameters.Length)
-            {
-                ctr = mCtr;
-                parameters = mParameters;
-            }
-        }
-
-        return ctr;
+        return new List<Type>(mappings.Keys);
     }
 
-    private List<Type> GetServiceTypes()
-    {
-        return new List<Type>(typeMappings.Keys);
-    }
-
-    private ServiceDescriptor MapDescriptor(ServiceDescriptor descriptor)
+    private ServiceDescriptor CreateDescriptorFromConstructor(ServiceDescriptor descriptor, IList<Type> extraTypes)
     {
         var type = descriptor.ServiceType;
 
-        if (Caching.CacheConstructor)
-        {
-            var services = GetServiceTypes();
-            var ctor = FindConstructor(type, services);
+        var availableServices = GetAvailableTypes();
+        availableServices.AddRange(extraTypes);
 
-            if (ctor == null)
+        Func<IServiceProvider, object>? factory = descriptor.ImplementationFactory;
+
+        if (factory == null)
+        {
+            if (!TryFindConstructor(type, availableServices, out var ctor, out var @params))
             {
                 throw new ConstructorNotFoundException($"Couldn't map type {type}: no constructor found compatible with registered services.");
             }
 
+            var requiredTypes = @params.GetTypes();
 
-
-            descriptor = new ServiceDescriptor(descriptor.ServiceType, , descriptor.Lifetime);
+            var binder = PopulateBinder(requiredTypes);
+            factory = delegate (IServiceProvider services)
+            {
+                return ctor.Invoke(binder);
+            };
         }
 
-        MapType(descriptor.ServiceType, descriptor.ServiceType);
+        return new ServiceDescriptor(descriptor.ServiceType, factory, descriptor.Lifetime);
     }
 
     private void MapType(Type root, Type curr)
@@ -277,101 +291,137 @@ public class ServiceCollection : IServiceCollection
             return;
         }
 
-        typeMappings.TryAdd(curr, root);
+        mappings.TryAdd(curr, root);
 
-        if (behavior.HasFlag(MappingBehavior.Interfaces))
+        MapInterfaces(root, curr);
+        MapClasses(root, curr);
+    }
+
+    private void MapInterfaces(Type root, Type curr)
+    {
+        if (Mapping.MappingBehavior.HasFlag(MappingBehavior.Interfaces))
         {
             foreach (var intr in curr.GetInterfaces())
             {
                 MapType(root, intr);
             }
         }
+    }
 
-        if (behavior.HasFlag(MappingBehavior.Classes))
+    private void MapClasses(Type root, Type curr)
+    {
+        if (Mapping.MappingBehavior.HasFlag(MappingBehavior.Classes))
         {
-            if (curr.BaseType != null)
+            static bool Continue(Type? type) => type != null && type != typeof(object);
+
+            do
             {
-                MapType(root, curr.BaseType);
+                mappings.TryAdd(curr, root);
             }
+            while (Continue(curr = root.BaseType));
         }
     }
 
-    private ConstructorInfo? FindConstructor(Type serviceType) => FindConstructor(serviceType, GetServiceTypes());
+    public ServiceDescriptor CreateDescriptorFromConstructor(ServiceDescriptor descriptor) => CreateDescriptorFromConstructor(descriptor, []);
     #endregion
 
     #region Making
-    public object Make(Type serviceType, object[] binder)
+    /// <summary>Creates an object binder for the provided types.</summary>
+    /// <param name="types">The types for the object binder.</param>
+    /// <param name="binder">The extra object instances available to create the binder.</param>
+    private object[] PopulateBinder(IList<Type> types, object[] binder)
     {
-        if (!typeMappings.TryGetValue(serviceType, out serviceType))
-        {
-            throw new ServiceNotFoundException($"Tried instanciating service type {serviceType} that is not registered.");
-        }
-
-        return MakeDirect(serviceType, binder);
-    }
-
-    private List<Type> GetBinder(object[] binder)
-    {
-        var serviceTypes = GetServiceTypes();
+        var mDescriptors = new Dictionary<Type, ServiceDescriptor>(descriptors);
         for (int i = 0; i < binder.Length; i++)
         {
-            serviceTypes.Add(binder[i].GetType());
+            mDescriptors.Add(binder[i].GetType(), new ServiceDescriptor(binder[i].GetType(), binder[i]));
         }
 
-        return serviceTypes;
-    }
+        binder = new object[types.Count];
 
-    public object MakeDirect(Type serviceType, object[] binder)
-    {
-        var serviceTypes = GetBinder(binder);
-        var constructor = FindConstructor(serviceType, serviceTypes);
-
-        if (constructor == null)
+        for (int i = 0; i < types.Count; i++)
         {
-            throw new ConstructorNotFoundException();
+
+            binder[i] = GetService(types[i]);
         }
 
-        binder = MakeBinder(constructor.GetParameters().GetTypes(), binder);
-        return Make(constructor, binder);
+        return binder;
     }
 
-    private object MakeDirect(ConstructorInfo constructor, object[] binder)
+    public object Make(Type serviceType, params object[] binder)
     {
-        var serviceTypes = GetServiceTypes();
+        var descriptor = new ServiceDescriptor(serviceType, serviceType, ServiceLifetime.Transient);
+        var availableTypes = new Type[binder.Length];
+
         for (int i = 0; i < binder.Length; i++)
         {
-            serviceTypes.Add(binder[i].GetType());
+            availableTypes[i] = binder[i].GetType();
         }
 
-        binder = MakeBinder(constructor.GetParameters().GetTypes());
-        return Make(constructor, binder);
+        descriptor = CreateDescriptorFromConstructor(descriptor, availableTypes);
+        return GetOrMake(descriptor);
     }
 
-    private object Make(ConstructorInfo creator, object[] binder)
+    private object GetOrMake(ServiceDescriptor descriptor)
     {
-        return creator.Invoke(binder);
+        if (descriptor.ImplementationInstance != null)
+        {
+            return descriptor.ImplementationInstance;
+        }
+
+        if (descriptor.ImplementationFactory == null)
+        {
+            throw new NullReferenceException("No implementation factory given when trying to create an instance from a service descriptor.");
+        }
+
+        return Make(descriptor);
     }
 
-    public object[] MakeBinder([NotNull] Type[] serviceTypes) => MakeBinder(serviceTypes, []);
-    public object[] MakeBinder([NotNull] Type[] serviceTypes, object[] extra)
+    public object Make(ServiceDescriptor descriptor)
     {
-        var instances = new object[serviceTypes.Length];
-        var map = new Dictionary<Type, ServiceDescriptor>(descriptors);
+        descriptor = CreateDescriptorFromConstructor(descriptor, []);
 
-        for (int i = 0; i < extra.Length; i++)
+        if (descriptor.ImplementationFactory == null)
         {
-            var type = extra[i].GetType();
-            map.Add(type, new(type, extra[i]));
+            throw new ConstructorNotFoundException($"Could not define the implementation factory for service type {descriptor.ServiceType}.");
         }
 
-        for (int i = 0; i < serviceTypes.Length; i++)
-        {
-            instances[i] = GetService(serviceTypes[i]);
-        }
-
-        return instances;
+        var instance = descriptor.ImplementationFactory(this);
+        return instance;
     }
 
+    private bool TryFindConstructor(Type type, IList<Type> availableTypes, out ConstructorInfo? ctor, out ParameterInfo[]? parms)
+    {
+        ctor = null;
+        parms = null;
+
+        int lenParms = -1;
+        var ctors = type.GetConstructors(Mapping.ConstructorFlags);
+
+        for (int i = 0; i < ctors.Length; i++)
+        {
+            int matchedParameters = 0;
+            var mParameters = ctors[i].GetParameters();
+
+            foreach (var param in mParameters)
+            {
+                if (availableTypes.Contains(param.ParameterType))
+                {
+                    matchedParameters++;
+                }
+            }
+
+            if (lenParms < matchedParameters)
+            {
+                ctor = ctors[i];
+                parms = mParameters;
+            }
+        }
+
+        return ctor != null;
+    }
+
+    private object[] PopulateBinder(IList<Type> types) => PopulateBinder(types, []);
     public object Make(Type serviceType) => Make(serviceType, []);
     #endregion
 

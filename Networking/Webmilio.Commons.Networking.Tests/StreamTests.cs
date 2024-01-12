@@ -9,7 +9,7 @@ namespace Webmilio.Commons.Networking.Tests;
 [TestClass]
 public class StreamTests
 {
-    private ServiceCollection _services;
+    private OldServiceCollection _services;
 
     [TestInitialize]
     public void Initialize()

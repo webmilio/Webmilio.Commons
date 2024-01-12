@@ -4,5 +4,5 @@ namespace Webmilio.Commons.DependencyInjection;
 
 public interface IServiceFactory
 {
-    public object Make(Type serviceType, object[] binder);
+    public object Make(Type serviceType);
 }

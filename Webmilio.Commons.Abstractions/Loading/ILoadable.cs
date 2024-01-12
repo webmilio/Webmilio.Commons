@@ -1,7 +1,6 @@
-﻿namespace Webmilio.Commons.Loaders
+﻿namespace Webmilio.Commons.Loading;
+
+public interface ILoadable
 {
-    public interface ILoadable
-    {
-        bool Load();
-    }
+    bool Load();
 }

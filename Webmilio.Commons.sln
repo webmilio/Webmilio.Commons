@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.Abstractio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.Networking", "Networking\Webmilio.Commons.Networking\Webmilio.Commons.Networking.csproj", "{642F225A-F9BA-4BEC-A131-826226784AE4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.DependencyInjection.DependencyInjection.Tests", "DependencyInjection\Webmilio.Commons.DependencyInjection.Tests\Webmilio.Commons.DependencyInjection.DependencyInjection.Tests.csproj", "{56EAB09F-AD6C-4A59-9249-A515E63D7214}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.DependencyInjection.Tests", "DependencyInjection\Webmilio.Commons.DependencyInjection.Tests\Webmilio.Commons.DependencyInjection.Tests.csproj", "{56EAB09F-AD6C-4A59-9249-A515E63D7214}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.Networking.Tests", "Networking\Webmilio.Commons.Networking.Tests\Webmilio.Commons.Networking.Tests.csproj", "{3C60B1D3-879B-47F1-829F-5A59D3314E71}"
 EndProject
@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.Serializat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.Serialization", "Serialization\Webmilio.Commons.Serialization\Webmilio.Commons.Serialization.csproj", "{6EC1BBA3-127F-4868-8F81-AFED16FBF874}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webmilio.Commons.Tests", "Webmilio.Commons.Tests\Webmilio.Commons.Tests.csproj", "{03D45B2A-F434-4961-8655-FE7385AABAB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmilio.Commons.Tests", "Webmilio.Commons.Tests\Webmilio.Commons.Tests.csproj", "{03D45B2A-F434-4961-8655-FE7385AABAB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

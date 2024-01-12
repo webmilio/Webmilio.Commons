@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -85,25 +86,28 @@ namespace Webmilio.Commons.Extensions
                 action(source.GetValue(i), i);
         }
 
-        public static void Do<T>(this IList<T> source, Action<T> action) => Do(source, (t, i) => action(t));
-        public static void Do<T>(this IList<T> source, Action<T, int> action) => Do(source, 0, action);
-        public static void Do<T>(this IList<T> source, int startIndex, Action<T> action) => Do(source, startIndex, (t, i) => action(t));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static void Do<T>(this IList<T> source, Action<T> action) => Do(source, (t, i) => action(t));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static void Do<T>(this IList<T> source, Action<T, int> action) => Do(source, 0, source.Count, action);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] public static void Do<T>(this IList<T> source, int startIndex, Action<T> action) => Do(source, startIndex, source.Count, (t, i) => action(t));
 
-        public static void Do<T>(this IList<T> source, int startIndex, Action<T, int> action)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Do<T>(this IList<T> source, int startIndex, int length, Action<T, int> action)
         {
-            for (int i = 0; i < source.Count; i++)
+            for (int i = startIndex; i < length; i++)
                 action(source[i], i);
         }
 
 
         public static Task DoAsync<T>(this IList<T> source, Func<T, Task> action) => DoAsync(source, (t, i) => action(t));
-        public static Task DoAsync<T>(this IList<T> source, Func<T, int, Task> action) => DoAsync(source, 0, action);
-        public static Task DoAsync<T>(this IList<T> source, int startIndex, Func<T, Task> action) => DoAsync(source, startIndex, (t, i) => action(t));
+        public static Task DoAsync<T>(this IList<T> source, Func<T, int, Task> action) => DoAsync(source, 0, source.Count, action);
+        public static Task DoAsync<T>(this IList<T> source, int startIndex, Func<T, Task> action) => DoAsync(source, startIndex, source.Count, (t, i) => action(t));
 
-        public static async Task DoAsync<T>(this IList<T> source, int startIndex, Func<T, int, Task> action)
+        public static async Task DoAsync<T>(this IList<T> source, int startIndex, int length, Func<T, int, Task> action)
         {
-            for (int i = 0; i < source.Count; i++)
+            for (int i = startIndex; i < length; i++)
+            {
                 await action(source[i], i);
+            }
         }
 
 

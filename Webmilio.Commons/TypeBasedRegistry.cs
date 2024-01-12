@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Webmilio.Commons.Serialization;
+namespace Webmilio.Commons;
 
 public class TypeBasedRegistry<T> : ITypeBasedRegistry<T>
 {

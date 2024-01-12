@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 
-namespace Webmilio.Commons.Assemblies;
+namespace Webmilio.Commons;
 
 public interface IAssemblyResolver
 {
