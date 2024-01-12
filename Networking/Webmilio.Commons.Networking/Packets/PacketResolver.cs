@@ -6,13 +6,13 @@ namespace Webmilio.Commons.Networking.Packets;
 
 public class PacketResolver : IPacketResolver
 {
-    private readonly IServiceCollection _services;
+    private readonly ICompleteServiceCollection _services;
 
     private short lastIndex = 1;
     private readonly Dictionary<short, Type> _types = new();
     private readonly Dictionary<Type, short> _ids = new();
 
-    public PacketResolver(IServiceCollection services)
+    public PacketResolver(ICompleteServiceCollection services)
     {
         _services = services;
     }

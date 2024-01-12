@@ -4,7 +4,7 @@ using System.ComponentModel.Design;
 
 namespace Webmilio.Commons.DependencyInjection;
 
-public interface IServiceCollection : Microsoft.Extensions.DependencyInjection.IServiceCollection, 
+public interface ICompleteServiceCollection : IServiceCollection, 
     IServiceContainer, IServiceFactory, ISupportRequiredService
 {
 }

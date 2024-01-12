@@ -9,7 +9,7 @@ using Webmilio.Commons.Extensions.Reflection;
 
 namespace Webmilio.Commons.DependencyInjection;
 
-public class ServiceCollection : IServiceCollection
+public class ServiceCollection : ICompleteServiceCollection
 {
     public class CacheProperties
     {

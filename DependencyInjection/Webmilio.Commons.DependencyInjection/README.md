@@ -1,0 +1,1 @@
+﻿Default implementation of ICompleteServiceCollection from Webmilio.Commons.DependencyInjection.Abstraction.
