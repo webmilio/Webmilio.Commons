@@ -26,6 +26,42 @@ public class Singleton : BaseTest
     }
 
     [TestMethod]
+    public void AddService_NotifiesEvent()
+    {
+        ServiceDescriptor? descriptor = null;
+
+        col.ServiceAdded += Handler;
+        col.AddSingleton<X>();
+
+
+        void Handler(ServiceDescriptor _descriptor)
+        {
+            descriptor = _descriptor;
+        }
+
+        Assert.IsNotNull(descriptor);
+        Assert.AreEqual(typeof(X), descriptor.ServiceType);
+    }
+
+    [TestMethod]
+    public void AddSingletonInstance_NotifiesEvent()
+    {
+        ServiceDescriptor? descriptor = null;
+
+        col.ServiceInstanced += Handler;
+        col.AddSingleton(new X());
+
+        void Handler(ServiceDescriptor _descriptor)
+        {
+            descriptor = _descriptor;
+        }
+
+        Assert.IsNotNull(descriptor);
+        Assert.AreEqual(typeof(X), descriptor.ServiceType);
+        Assert.IsNotNull(descriptor.ImplementationInstance);
+    }
+
+    [TestMethod]
     public void AddService_ServiceCreatorCallback()
     {
         col.AddService(typeof(X), (s, t) => new X());

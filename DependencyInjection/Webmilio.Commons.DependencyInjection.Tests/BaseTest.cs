@@ -4,7 +4,7 @@ namespace Webmilio.Commons.DependencyInjection.Tests;
 
 public class BaseTest
 {
-    protected DependencyInjection.ServiceCollection col;
+    protected DependencyInjection.WServiceCollection col;
 
     public class X { }
     public class Y(X x) : IA

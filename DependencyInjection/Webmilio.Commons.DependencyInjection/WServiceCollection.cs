@@ -85,6 +85,7 @@ public class WServiceCollection : ICompleteServiceCollection
         if (descriptor.ImplementationInstance != null)
         {
             services.Add(rootType, descriptor);
+            ServiceInstanced?.Invoke(descriptor);
         }
         else
         {
@@ -110,6 +111,13 @@ public class WServiceCollection : ICompleteServiceCollection
     {
         idxDescriptors.Insert(index, item);
         descriptors.Add(item.ServiceType, item);
+
+        if (item.ImplementationInstance != null)
+        {
+            ServiceInstanced.Invoke(item);
+        }
+
+        ServiceAdded?.Invoke(item);
     }
     #endregion
 
@@ -201,7 +209,10 @@ public class WServiceCollection : ICompleteServiceCollection
 
         if (Caching.CacheConstructorOnGetService && descriptor.Lifetime == ServiceLifetime.Singleton)
         {
-            services.Add(type, new ServiceDescriptor(type, instance));
+            var localDescriptor = new ServiceDescriptor(type, instance);
+
+            services.Add(type, localDescriptor);
+            ServiceInstanced?.Invoke(localDescriptor);
         }
 
         return instance;
@@ -223,9 +234,8 @@ public class WServiceCollection : ICompleteServiceCollection
     #endregion
 
     #region Other
-    public delegate void ServiceCollectionModifiedDelegate(ServiceDescriptor descriptor);
-
-    public event ServiceCollectionModifiedDelegate ServiceAdded, ServiceRemoved;
+    public delegate void ServiceRelatedDelegate(ServiceDescriptor descriptor);
+    public event ServiceRelatedDelegate? ServiceAdded, ServiceRemoved, ServiceInstanced;
 
     public void Clear()
     {
