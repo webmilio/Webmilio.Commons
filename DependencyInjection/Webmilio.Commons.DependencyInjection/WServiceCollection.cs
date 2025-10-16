@@ -9,7 +9,7 @@ using Webmilio.Commons.Extensions.Reflection;
 
 namespace Webmilio.Commons.DependencyInjection;
 
-public class ServiceCollection : ICompleteServiceCollection
+public class WServiceCollection : ICompleteServiceCollection
 {
     public class CacheProperties
     {
@@ -29,6 +29,8 @@ public class ServiceCollection : ICompleteServiceCollection
     }
 
     protected readonly Dictionary<Type, Type> mappings = [];
+
+    protected readonly List<ServiceDescriptor> idxDescriptors = [];
     protected readonly Dictionary<Type, ServiceDescriptor> descriptors = [];
 
     protected readonly Dictionary<Type, ServiceDescriptor> services = [];
@@ -39,6 +41,11 @@ public class ServiceCollection : ICompleteServiceCollection
     public int Count => descriptors.Count;
 
     public bool IsReadOnly => false;
+
+    public WServiceCollection()
+    {
+        AddService(GetType(), this);
+    }
 
     #region Adding
     public void AddService(Type serviceType, ServiceCreatorCallback callback)
@@ -93,11 +100,13 @@ public class ServiceCollection : ICompleteServiceCollection
         }
 
         descriptors.TryAdd(rootType, item);
+        idxDescriptors.Add(item);
     }
 
     public void Insert(int index, ServiceDescriptor item)
     {
-        throw new NotImplementedException();
+        idxDescriptors.Insert(index, item);
+        descriptors.Add(item.ServiceType, item);
     }
     #endregion
 
@@ -119,8 +128,13 @@ public class ServiceCollection : ICompleteServiceCollection
             mappings.Remove(toRemove[i]);
         }
 
-        descriptors.Remove(serviceType);
-        services.Remove(serviceType);
+        if (descriptors.TryGetValue(serviceType, out var descriptor))
+        {
+            descriptors.Remove(serviceType);
+            idxDescriptors.Remove(descriptor);
+
+            services.Remove(serviceType);
+        }
     }
 
     public void RemoveService(Type serviceType, bool promote)
@@ -142,7 +156,8 @@ public class ServiceCollection : ICompleteServiceCollection
 
     public void RemoveAt(int index)
     {
-        throw new NotImplementedException();
+        var descriptor = idxDescriptors[index];
+        Remove(descriptor);
     }
     #endregion
 
@@ -228,22 +243,22 @@ public class ServiceCollection : ICompleteServiceCollection
 
     public void CopyTo(ServiceDescriptor[] dst, int arrayIndex)
     {
-        throw new NotImplementedException();
+        idxDescriptors.CopyTo(dst, arrayIndex);
     }
 
     public IEnumerator<ServiceDescriptor> GetEnumerator()
     {
-        throw new NotImplementedException();
+        return idxDescriptors.GetEnumerator();
     }
 
     public int IndexOf(ServiceDescriptor item)
     {
-        throw new NotImplementedException();
+        return idxDescriptors.IndexOf(item);
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        throw new NotImplementedException();
+        return idxDescriptors.GetEnumerator();
     }
     #endregion
 
@@ -318,7 +333,7 @@ public class ServiceCollection : ICompleteServiceCollection
             {
                 mappings.TryAdd(curr, root);
             }
-            while (Continue(curr = root.BaseType));
+            while (Continue(curr = curr.BaseType));
         }
     }
 
@@ -425,5 +440,17 @@ public class ServiceCollection : ICompleteServiceCollection
     public object Make(Type serviceType) => Make(serviceType, []);
     #endregion
 
-    public ServiceDescriptor this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public bool IsService(Type serviceType) => Contains(serviceType);
+
+    public ServiceDescriptor this[int index] 
+    {
+        get => idxDescriptors[index];
+        set
+        {
+            var original = idxDescriptors[index];
+
+            idxDescriptors[index] = value;
+            services[original.ServiceType] = value;
+        }
+    }
 }
