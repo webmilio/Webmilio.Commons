@@ -77,30 +77,33 @@ public class WServiceCollection : ICompleteServiceCollection
         Add(item.ServiceType, item);
     }
 
-    private void Add(Type rootType, ServiceDescriptor item)
+    private void Add(Type rootType, ServiceDescriptor descriptor)
     {
         MapType(rootType, rootType);
 
         // Implies that the item is a singleton.
-        if (item.ImplementationInstance != null)
+        if (descriptor.ImplementationInstance != null)
         {
-            services.Add(rootType, item);
+            services.Add(rootType, descriptor);
         }
         else
         {
             if (Mapping.CacheConstructorOnMapping)
             {
-                item = CreateDescriptorFromConstructor(item, []);
+                descriptor = CreateDescriptorFromConstructor(descriptor, []);
             }
 
             if (Caching.InvalidateOnServiceRegistrationChange)
             {
-                UpdateRegistrations();
+                // TODO Implement service registration update
+                // UpdateRegistrations();
             }
         }
 
-        descriptors.TryAdd(rootType, item);
-        idxDescriptors.Add(item);
+        descriptors.TryAdd(rootType, descriptor);
+        idxDescriptors.Add(descriptor);
+
+        ServiceAdded?.Invoke(descriptor);
     }
 
     public void Insert(int index, ServiceDescriptor item)
@@ -134,6 +137,7 @@ public class WServiceCollection : ICompleteServiceCollection
             idxDescriptors.Remove(descriptor);
 
             services.Remove(serviceType);
+            ServiceRemoved?.Invoke(descriptor);
         }
     }
 
@@ -143,14 +147,14 @@ public class WServiceCollection : ICompleteServiceCollection
     }
 
     public void RemoveService(ServiceDescriptor descriptor) => Remove(descriptor);
-    public bool Remove(ServiceDescriptor item)
+    public bool Remove(ServiceDescriptor descriptor)
     {
-        if (!descriptors.TryGetValue(item.ServiceType, out var descriptor))
+        if (!descriptors.TryGetValue(descriptor.ServiceType, out var knownDescriptor))
         {
             return false;
         }
 
-        RemoveService(descriptor.ServiceType);
+        RemoveService(knownDescriptor.ServiceType);
         return true;
     }
 
@@ -219,10 +223,9 @@ public class WServiceCollection : ICompleteServiceCollection
     #endregion
 
     #region Other
-    public void UpdateRegistrations()
-    {
+    public delegate void ServiceCollectionModifiedDelegate(ServiceDescriptor descriptor);
 
-    }
+    public event ServiceCollectionModifiedDelegate ServiceAdded, ServiceRemoved;
 
     public void Clear()
     {

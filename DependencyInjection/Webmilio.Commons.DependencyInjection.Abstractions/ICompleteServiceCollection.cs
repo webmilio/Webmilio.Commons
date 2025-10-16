@@ -5,6 +5,6 @@ using System.ComponentModel.Design;
 namespace Webmilio.Commons.DependencyInjection;
 
 public interface ICompleteServiceCollection : IServiceCollection, 
-    IServiceContainer, IServiceFactory, ISupportRequiredService
+    IServiceContainer, IServiceFactory, ISupportRequiredService, IServiceProviderIsService
 {
 }
